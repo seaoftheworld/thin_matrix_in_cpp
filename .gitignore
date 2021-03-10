@@ -2,7 +2,7 @@
 .vs/
 bakup__/*
 building_output__/*
-!building_output__\x64_Debug
+!building_output__/x64_Debug/
 
 # src/00_libs/*
 # !src/00_libs/.gitkeep
