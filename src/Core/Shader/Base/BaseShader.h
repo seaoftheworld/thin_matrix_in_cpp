@@ -57,22 +57,46 @@ public:
         }
     }
 
-    void setTransformMatLoc(int input_loc) {
-        transform_matrix_loc = (GLint)input_loc;
-    }
-
-    int getTransformMatLoc() {
-        return (int)transform_matrix_loc;
-    }
-
     // This is supposed to be called in the rendering-loop, inside renderer() function for each entity
     void loadTransformMatrix(const float *input_data) {
         // if (status == link_prog_passed && progId > 0) {
         // }
         glUniformMatrix4fv(transform_matrix_loc, 1, false, input_data);
     }
+    void setTransformMatLoc(int input_loc) {
+        transform_matrix_loc = (GLint)input_loc;
+    }
+    int getTransformMatLoc() {
+        return (int)transform_matrix_loc;
+    }
 
-    // Tobe implemented by derived class according to
+    // This is supposed to be called in the rendering-loop
+    void loadViewMatrix(const float *input_data) {
+        // if (status == link_prog_passed && progId > 0) {
+        // }
+        glUniformMatrix4fv(view_matrix_loc, 1, false, input_data);
+    }
+    void setViewMatLoc(int input_loc) {
+        view_matrix_loc = (GLint)input_loc;
+    }
+    int getViewMatLoc() {
+        return (int)view_matrix_loc;
+    }
+
+    // This is Not-supposed to be called in the rendering-loop
+    void loadProjMatrix(const float *input_data) {
+        // if (status == link_prog_passed && progId > 0) {
+        // }
+        glUniformMatrix4fv(proj_matrix_loc, 1, false, input_data);
+    }
+    void setProjMatLoc(int input_loc) {
+        proj_matrix_loc = (GLint)input_loc;
+    }
+    int getProjMatLoc() {
+        return (int)proj_matrix_loc;
+    }
+
+    // Supposed tobe implemented by derived class according to
     // its details
     virtual void bindAllAttributeLocations() = 0;
     virtual void getAllUniformLocations() = 0;
@@ -141,7 +165,9 @@ private:
     enum ShaderStatus status;
     int progId;
 
-    GLint transform_matrix_loc = -1;
+    GLint transform_matrix_loc = -1,
+               view_matrix_loc = -1,
+               proj_matrix_loc = -1;
     GLuint vsh, fsh;
 
     int    initShader(const char *path, GLuint *id, GLenum type);

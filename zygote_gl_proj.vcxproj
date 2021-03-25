@@ -84,7 +84,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="external\gl3w\GL\gl3w.c" />
-    <ClCompile Include="src\02_multi_lights.cpp" />
     <ClCompile Include="src\Core\AssimpLib.cpp" />
     <ClCompile Include="src\Core\Common\data.cpp" />
     <ClCompile Include="src\Core\Common\gl_math.cpp" />
@@ -95,6 +94,14 @@
     <ClCompile Include="src\Core\Shader\MultiLightsShader.cpp" />
     <ClCompile Include="src\Core\Shader\SpecularShader.cpp" />
     <ClCompile Include="src\Core\Shader\StaticShader.cpp" />
+    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\test_cases\00_basics\00_basics.cpp" />
+    <ClCompile Include="src\test_cases\00_basics\BasicRenderer.cpp" />
+    <ClCompile Include="src\test_cases\01_specular_lighting\01_specular_lighting.cpp" />
+    <ClCompile Include="src\test_cases\01_specular_lighting\SpecularRenderer.cpp" />
+    <ClCompile Include="src\test_cases\02_multi_lighting\02_multi_lighting.cpp" />
+    <ClCompile Include="src\test_cases\02_multi_lighting\MultiLightingRenderer.cpp" />
+    <ClCompile Include="src\test_cases\02_multi_lighting\LightsPositionData.cpp" />
     <ClCompile Include="src\WindowSystem\WindowSystem.cpp" />
   </ItemGroup>
   <ItemGroup>

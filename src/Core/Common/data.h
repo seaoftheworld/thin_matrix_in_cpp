@@ -203,6 +203,8 @@ struct Transform {
 
     float values[transform::max];
 
+    Transform() {
+    }
     Transform(float input_values[][transform::max]) {
         if (!input_values)
             return;
@@ -239,6 +241,7 @@ struct Transform {
 };
 
 class Entity {
+
 public:
     enum transform {
         x = 0, y, z, rot_x, rot_y, rot_z, scale, max
@@ -252,6 +255,7 @@ public:
         transforms.clear();
     }
 
+public:
     void setTextureModel(StaticTexture *t, BaseModel *m) {
         // if (!t || !m) {
         //     return;
@@ -320,6 +324,7 @@ public:
         return model;
     }
 
+public:
     void increasePosition(unsigned int i, float dx, float dy, float dz) {
         // (*(info[i].getData()))[x] += dx;
         // (*(info[i].getData()))[y] += dy;
@@ -345,28 +350,45 @@ public:
     //     (transforms[i].values)[rot_z] = rotz;
     // }
 
-    void setTransformValue(unsigned int transform_idx, unsigned int value_idx, float input_value) {
-        if (transform_idx < transforms.size() && value_idx < transform::max) {
-            transforms[transform_idx].values[value_idx] = input_value;
+        void setTransformValue(unsigned int transform_idx, unsigned int value_idx, float input_value) {
+            if (transform_idx < transforms.size() && value_idx < transform::max) {
+                transforms[transform_idx].values[value_idx] = input_value;
+            }
         }
-    }
 
-    void increaseTransformValue(unsigned int transform_idx, unsigned int value_idx, float delta) {
-        if (transform_idx < transforms.size() && value_idx < transform::max) {
-            transforms[transform_idx].values[value_idx] += delta;
+        // void increaseTransformValue(unsigned int transform_idx, unsigned int value_idx, float delta) {
+        //     if (transform_idx < transforms.size() && value_idx < transform::max) {
+        //         transforms[transform_idx].values[value_idx] += delta;
+        //     }
+        // }
+
+        // void setTransformValues(unsigned int start_idx, unsigned int num, float *input_data) {
+        //     if (start_idx < transform::max) {
+
+        //         for (unsigned int i = 0; (i < num) && (i < transform::max); i++) {
+        //             if (input_data) {
+        //                 values[start_idx + i] = *input_data; input_data++;
+        //             }
+        //         }
+        //     }
+        // }
+
+        void setTransformValues(unsigned int transform_idx, float *input_data, unsigned int *input_offset, unsigned int input_offset_num) {
+
+            if (!input_offset || !input_data) {
+                return;
+            }
+
+            for (unsigned int i = 0; i < input_offset_num && i < transform::max; i++) {
+                if (input_offset[i] >= transform::max) {
+                    continue;
+                }
+
+                if (input_data) {
+                    transforms[transform_idx].values[ input_offset[i] ] = input_data[i];
+                }
+            }
         }
-    }
-
-    // void setTransformValues(unsigned int start_idx, unsigned int num, float *input_data) {
-    //     if (start_idx < transform::max) {
-
-    //         for (unsigned int i = 0; (i < num) && (i < transform::max); i++) {
-    //             if (input_data) {
-    //                 values[start_idx + i] = *input_data; input_data++;
-    //             }
-    //         }
-    //     }
-    // }
 
 private:
     // std::vector<EntityInfo> info;
@@ -374,38 +396,4 @@ private:
 
     StaticTexture *texture;
     BaseModel *model;
-};
-
-class Light {
-public:
-    enum pos {x = 0, y, z, max_pos};
-    enum color {r = 0, g, b, max_color};
-
-    void setPosition(float input_data[][max_pos]) {
-        if (input_data) {
-            for (unsigned char i = x; i < max_pos; i++) {
-                position[i] = (*input_data)[i];
-            }
-        }
-    }
-
-    void setColor(float input_data[][max_color]) {
-        if (input_data) {
-            for (unsigned char i = r; i < max_color; i++) {
-                color[i] = (*input_data)[i];
-            }
-        }
-    }
-
-    const float *getPosition3fv() {
-        return &position[0];
-    }
-
-    const float *getColor3fv() {
-        return &color[0];
-    }
-
-private:
-    float position[max_pos];
-    float color[max_color];
 };

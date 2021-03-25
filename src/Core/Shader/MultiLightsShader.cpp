@@ -56,30 +56,35 @@ void MultiLightsShader::getAllUniformLocations() {
     printf("    override for getting uniform-loc called.\n");
 
     setTransformMatLoc(getUniformLocation("transformMatrix"));
+    setViewMatLoc(getUniformLocation("viewMatrix"));
+    setProjMatLoc(getUniformLocation("projMatrix"));
 
-    view_loc = getUniformLocation("viewMatrix");
-    proj_loc = getUniformLocation("projMatrix");
-
-    printf("    unif_loc for mvp loc: %d, %d, %d\n\n", getTransformMatLoc(), view_loc, proj_loc);
+    printf("    unif_loc for mvp loc: %d, %d, %d\n\n", 
+        getTransformMatLoc(), getViewMatLoc(), getProjMatLoc());
 
     std::string prefix0 = "lightPosition[";
     std::string prefix1 = "lightColor[";
-    // std::string prefix0 = "lightPosition";
-    // std::string prefix1 = "lightColor";
+    std::string prefix2 = "lightAttenuation[";
     
     for (int i = 0; i < SHADER_MAX_LIGHTS; i++) {
 
         std::string result = prefix0 + std::to_string(i) + "]";
         // std::string result = prefix0 + std::to_string(i);
-        printf("light pos: %s\n", result.c_str());
+        // printf("light pos: %s\n", result.c_str());
         lightPosition_loc[i] = getUniformLocation(result.c_str());
 
         result = prefix1 + std::to_string(i) + "]";
         // result = prefix1 + std::to_string(i);
-        printf("light color: %s\n", result.c_str());
+        // printf("light color: %s\n", result.c_str());
         lightColor_loc[i] = getUniformLocation(result.c_str());
 
-        printf("    unif_loc for light_pos/color: %d, %d\n", lightPosition_loc[i], lightColor_loc[i]);
+        result = prefix2 + std::to_string(i) + "]";
+        // printf("light att: %s\n", result.c_str());
+        lightAttenuation_loc[i] = getUniformLocation(result.c_str());
+
+        printf("    unif_loc-%d for light_pos:         %d\n", i,    lightPosition_loc[i]);
+        printf("    unif_loc-%d for light_color:       %d\n", i,       lightColor_loc[i]);
+        printf("    unif_loc-%d for light_attenuation: %d\n\n", i, lightAttenuation_loc[i]);
     }
     printf("\n\n");
 

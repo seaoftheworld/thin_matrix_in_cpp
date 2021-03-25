@@ -25,6 +25,7 @@ int WindowSystem::start() {
         return -1;
     }
 
+    glfwSetWindowPos(glfwWindow, 100, 100);
     glfwMakeContextCurrent(glfwWindow);
     window = glfwWindow;
     // valid = true;

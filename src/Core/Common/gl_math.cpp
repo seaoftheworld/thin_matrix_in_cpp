@@ -62,7 +62,11 @@ namespace gl_math {
         *result = rotate_xyz * translate * scale;
     }
 
-    void xyz_rot_z(float input_pos[][3], float rot_z, float output_result[][3]) {
+    // Supposed tobe used to get the positions of 4 lights according to 4 transforms of crates.
+    // Crates are rendered with STR model-matrix, not normal SRT matrix,
+    // so even though a crate is rendered and spins around axis-z,
+    // the xyz of this crate fixed, only rotz changes
+    void get_xyz_from_rotz(float input_pos[][3], float rot_z, float output_result[][3]) {
 
         if (!input_pos) {
             return;

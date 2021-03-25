@@ -1,11 +1,11 @@
 #pragma once
 #include "./Base/BaseShader.h"
+#include "Core/Common/light.h"
 
 #define SPECULAR_VSH_PATH "data/shaders/specular.vsh"
 #define SPECULAR_FSH_PATH "data/shaders/specular.fsh"
 
 class SpecularShader : public BaseShader {
-
 
 public:
     enum attrNum {
@@ -31,24 +31,9 @@ public:
     void bindAllAttributeLocations() override;
     void getAllUniformLocations() override;
 
-    // void loadTransformMatrix(const float *p) {
-    //     uniformMatrix4fv(transform_loc, p);
-    // }
-
-    void loadViewMatrix(const float *p) {
-        uniformMatrix4fv(view_loc, p);
-    }
-
-    void loadProjMatrix(const float *p) {
-        uniformMatrix4fv(proj_loc, p);
-    }
-
-    void loadLightPosition(const float *p3f) {
-        uniform3fv(lightPosition_loc, 1, p3f);
-    }
-
-    void loadLightColor(const float *p3f) {
-        uniform3fv(lightColor_loc, 1, p3f);
+    void loadLight(Light &light) {
+        uniform3fv(lightPosition_loc, 1, light.getPosition3fv());
+        uniform3fv(lightColor_loc, 1, light.getColor3fv());
     }
 
     void loadReflectivity(float input) {
@@ -64,10 +49,6 @@ public:
     // }
 
 private:
-    // int transform_loc = -1, // alpha_loc = -1,
-    int view_loc = -1, 
-        proj_loc = -1;
-
     int lightPosition_loc = -1, 
         lightColor_loc = -1,
 
@@ -75,9 +56,8 @@ private:
         objShineDamper_loc = -1;
     
     void specificSettingsOn() {
-        // glClearColor(0.7f, 0.7f, 0.8f, 1.0f);
-        // glClearColor(0.7f, 0.7f, 0.8f, 1.0f);
-        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+        // glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+        glClearColor(0.7f, 0.7f, 0.8f, 1.0f);
 
         glEnable(GL_DEPTH_TEST);
         glDepthFunc(GL_LESS);
@@ -90,8 +70,6 @@ private:
         // glEnable(GL_CULL_FACE);  // requried the model to be enclosed, otherwise
         // glCullFace(GL_BACK);     // will not be correctly displayed ???
         // glCullFace(GL_FRONT);
-
-
     }
 
     void specificSettingsOff() {

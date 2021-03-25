@@ -54,13 +54,15 @@ void SpecularShader::getAllUniformLocations() {
     printf("    override for getting uniform-loc called.\n");
 
     // transform_loc = getUniformLocation("transformMatrix");
+    // view_loc = getUniformLocation("viewMatrix");
+    // proj_loc = getUniformLocation("projMatrix");
     setTransformMatLoc(getUniformLocation("transformMatrix"));
-
-    view_loc = getUniformLocation("viewMatrix");
-    proj_loc = getUniformLocation("projMatrix");
+    setViewMatLoc(getUniformLocation("viewMatrix"));
+    setProjMatLoc(getUniformLocation("projMatrix"));
 
     // printf("    unif_loc for mvp loc: %d, %d, %d\n\n", transform_loc, view_loc, proj_loc);
-    printf("    unif_loc for mvp loc: %d, %d, %d\n\n", getTransformMatLoc(), view_loc, proj_loc);
+    printf("    unif_loc for mvp loc: %d, %d, %d\n\n", 
+        getTransformMatLoc(), getViewMatLoc(), getProjMatLoc());
 
     lightPosition_loc = getUniformLocation("lightPosition");
     lightColor_loc = getUniformLocation("lightColor");

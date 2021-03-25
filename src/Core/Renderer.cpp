@@ -10,14 +10,12 @@
 #define     KEY_MOVE_SPEED (0.05f)
 #define             FACTOR (1.0f)
 
-void Renderer::calculateProjMatrix() {
-    // Typo caused error, cost hours to find the root-cause !!!                               !!!!!
-    // projection_matrix = gl_math::perspective(gl_math::radians(FOV), (float)WIN_WIDTH / WIN_WIDTH, NEAR_PLANE, FAR_PLANE);
+void HighLevelRenderer::calculateProjMatrix() {
     projection_matrix = gl_math::perspective(gl_math::radians(FOV), (float)WIN_WIDTH / WIN_HEIGHT, NEAR_PLANE, FAR_PLANE);
 }
 
-// void Renderer::render(Entity *entity, StaticShader *shader) {
-void Renderer::render(Entity *entity, BaseShader *shader, unsigned int str_rot) {
+// void EntityRenderer::process(Entity *entity, BaseShader *shader, unsigned int str_rot) {
+void EntityRenderer::render(Entity *entity, BaseShader *shader) {
     // shader->start();
     if (!entity || !shader) {
         return;
@@ -32,7 +30,6 @@ void Renderer::render(Entity *entity, BaseShader *shader, unsigned int str_rot) 
 
     if (static_texture) {
         // bind a texture buffer object
-        // printf("texture  \n");
         int texture_id = static_texture->getId();
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture_id);
@@ -46,19 +43,9 @@ void Renderer::render(Entity *entity, BaseShader *shader, unsigned int str_rot) 
             {
                 indices_count = ((StaticModel_SingleVbo *)static_model)->getNumIndices();
 
+                // TODO: use to C++ static/dynamic cast instead
                 int vbo_id = ((StaticModel_SingleVbo*)static_model)->getVboId();
                 int ibo_id = ((StaticModel_SingleVbo*)static_model)->getIboId();
-
-                    // printf("buff ids: %d, %d ", vbo_id, ibo_id);
-                    // printf("valid attr num: %d ", StaticModel_SingleVbo::valid_attr_num);
-                    // printf("idx: %d, %d  ", 
-                    //     StaticModel_SingleVbo::valid_attr_idx[0], 
-                    //     StaticModel_SingleVbo::valid_attr_idx[1]);
-                    // printf("attr-offset: %d, %d \n", 
-                    //     StaticModel_SingleVbo::valid_attr_offset[0], 
-                    //     StaticModel_SingleVbo::valid_attr_offset[1]);
-                    // printf("attr stride: %d, %d ", StaticModel_SingleVbo::valid_attr_stride[0], StaticModel_SingleVbo::valid_attr_stride[1]);
-                    // printf("total stride: %d\n", StaticModel_SingleVbo::single_vbo_stride_in_float);
 
                 // bind the all-in-one vbo
                 {
@@ -90,7 +77,6 @@ void Renderer::render(Entity *entity, BaseShader *shader, unsigned int str_rot) 
 
                 int vbos_ibo_ids[StaticModel::allBuffNum];
                 ((StaticModel *)static_model)->getBuffers(&vbos_ibo_ids);
-
                     // printf("vbo-num: %d, all buffnum: %d", StaticModel::vboNum, StaticModel::allBuffNum);
                     // printf("ids: %d, %d, %d  ", vbos_ibo_ids[0], vbos_ibo_ids[1], vbos_ibo_ids[2]);
                     // printf("attr-idx: %d, %d ", StaticModel::vbo_atrr_idx[0], StaticModel::vbo_atrr_idx[1]);
@@ -130,11 +116,12 @@ void Renderer::render(Entity *entity, BaseShader *shader, unsigned int str_rot) 
             
             {
                 gl_math::mat4 model_matrix;
-                if (str_rot) {
-                    // gl_math::model_matrix_STR_Rot(entity->getInfo(i), &model_matrix);
-                    gl_math::model_matrix_STR_Rot(entity->getTransformValues(i), &model_matrix);
-                }
-                else {
+                // if (str_rot) {
+                //     // gl_math::model_matrix_STR_Rot(entity->getInfo(i), &model_matrix);
+                //     gl_math::model_matrix_STR_Rot(entity->getTransformValues(i), &model_matrix);
+                // }
+                // else 
+                {
                     // gl_math::model_matrix_SRT_Normal(entity->getInfo(i), &model_matrix);
                     gl_math::model_matrix_SRT_Normal(entity->getTransformValues(i), &model_matrix);
                 }

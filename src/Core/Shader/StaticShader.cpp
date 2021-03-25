@@ -49,18 +49,13 @@ void StaticShader::bindAllAttributeLocations() {
 }
 
 void StaticShader::getAllUniformLocations() {
-    printf("    override for getting uniform-loc called.\n");
-    
-    // mvp_loc = getUniformLocation("mvp");
+    printf("    override for getting uniform-loc called.\n");    
     // alpha_loc = getUniformLocation("blendAlpha");
-    // // alpha_loc = getUniformLocation("texSampler");
 
-    // transform_loc = getUniformLocation("transformMatrix");
     setTransformMatLoc(getUniformLocation("transformMatrix"));
+    setViewMatLoc(getUniformLocation("viewMatrix"));
+    setProjMatLoc(getUniformLocation("projMatrix"));
 
-    view_loc = getUniformLocation("viewMatrix");
-    proj_loc = getUniformLocation("projMatrix");
-
-    // printf("    unif_loc for mvp loc: %d, %d, %d\n\n", transform_loc, view_loc, proj_loc);
-    printf("    unif_loc for mvp loc: %d, %d, %d\n\n", getTransformMatLoc(), view_loc, proj_loc);
+    printf("    unif_loc for mvp loc: %d, %d, %d\n\n", 
+        getTransformMatLoc(), getViewMatLoc(), getProjMatLoc());
 }

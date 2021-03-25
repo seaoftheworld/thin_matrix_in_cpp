@@ -1,9 +1,10 @@
 #define __USE_INLINE_METHODS__
 #include "../WindowSystem/WindowSystem.h"  // To use WIN_WIDTH, WIN_HEIGHT, 'WindowSystem' class, and its input functions...
 
-#include "Shader/StaticShader.h"
-#include "Shader/SpecularShader.h"
-#include "Shader/MultiLightsShader.h"
+#include "Core/Shader/Base/BaseShader.h"
+// #include "Shader/StaticShader.h"  // basic shader
+// #include "Shader/SpecularShader.h"
+// #include "Shader/MultiLightsShader.h"
 
 #include "Common/gl_header.h"
 #include "Common/gl_math.h"
@@ -79,9 +80,21 @@ private:
     float hAngle, vAngle;
 };
 
-class Renderer {
+class EntityRenderer {
+public:
+    // void process(Entity *entity, BaseShader *shader, unsigned int str_rot);
+    void render(Entity *entity, BaseShader *shader);
+};
+
+class TrnRenderer {
+public:
+    void render() {}
+};
+
+class HighLevelRenderer {
 
 public:
+    // Supposed to be called before an object is instanced
     static int init() {
         if (gl3wInit()) {
             return 0;
@@ -89,19 +102,33 @@ public:
         return 1;
     }
 
-    // Renderer(StaticShader *shader) {
-    Renderer() {
-        std::cout << "  Renderer() info: " << std::endl;
+    HighLevelRenderer() {        
+        printf("  __ hl-renderer constructor called.\n");
+
+        std::cout << "  HighLevelRenderer() info: " << std::endl;
         std::cout << "    Vendor:  " << glGetString(GL_VENDOR) << std::endl;
         std::cout << "    Render:  " << glGetString(GL_RENDERER) << std::endl;
         std::cout << "    Version: " << glGetString(GL_VERSION) << std::endl;
-
-        calculateProjMatrix();
+        
+        calculateProjMatrix();  // only have to calculate once if window not resized
+        clearEntities();
     }
 
-    void calculateProjMatrix();
+    virtual ~HighLevelRenderer() {
+        printf("  __ hl-renderer destructor called.\n");
+        clearEntities();
+    }
+
+public:
+    // Tobe called by derived class in its constructor, after
+    // virtual funcs are implemented according to
+    // derived class' details
+    virtual void allocEntityShader() = 0;  // only have to be called once before the rendering loop
+    virtual void cleanUp() = 0;
     
-    void calculateViewMatrix(const gl_math::vec3 &cam_pos, const gl_math::vec3 &cam_direc, const gl_math::vec3 &cam_up) {    
+    void calculateProjMatrix();            // only have to calculate once if window not resized
+
+    void calculateViewMatrix(const gl_math::vec3 &cam_pos, const gl_math::vec3 &cam_direc, const gl_math::vec3 &cam_up) {
         view_matrix = gl_math::lookAt(
             cam_pos,             // Camera is here
             cam_pos + cam_direc, // and looks here : at the same position, plus "camDirection"
@@ -114,35 +141,38 @@ public:
     float *getProjMatrix() {
         return &projection_matrix[0][0];
     }
-        // // void loadProjMatrixToShader(StaticShader *shader) {
-        // void loadProjMatrixToShader(SpecularShader *shader) {
-        //     if (shader) {
-        //         shader->start();
-        //         shader->loadProjMatrix(&projection_matrix[0][0]);
-        //         shader->stop();
-        //     }
-        // }
 
-    // this is supposed to be called in the rendering loop is,
+    // this is supposed to be called in the rendering loop,
     // after shader is bound to / started
     float *getViewMatrix() {
         return &view_matrix[0][0];
     }
-        // // void loadViewMatrixToShader(StaticShader *shader) {
-        // void loadViewMatrixToShader(SpecularShader *shader) {
-        //     if (shader) {
-        //         shader->loadViewMatrix(&view_matrix[0][0]);
-        //     }
-        // }
 
-    void prepare() {
-        glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+public:
+    void addEntity(Entity *input_entity) {
+        if (input_entity) {
+            entities.push_back(input_entity);
+        }
     }
 
-    // void render(Entity *entity, StaticShader *shader);
-    void render(Entity *entity, BaseShader *shader, unsigned int str_rot);
+    unsigned int getEntitiesSize() {
+        return entities.size();
+    }
+
+    void clearEntities() {
+        entities.clear();
+    }
+
+    std::vector<Entity *> &getEntities() {
+        return entities;
+    }
+
+public:
+    BaseShader *entityShader = NULL;
 
 private:
     gl_math::mat4 projection_matrix = gl_math::mat4(1.0f);
     gl_math::mat4 view_matrix = gl_math::mat4(1.0f);
+
+    std::vector<Entity *> entities;
 };

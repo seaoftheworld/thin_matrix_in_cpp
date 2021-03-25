@@ -14,8 +14,7 @@ namespace gl_math {
 
     void model_matrix_SRT_Normal(const float transform[][Entity::transform::max], mat4 *result);
     void model_matrix_STR_Rot(const float transform[][Entity::transform::max], mat4 *result);
-
-    void xyz_rot_z(float input_pos[][3], float rot_z, float output_result[][3]);
+    void get_xyz_from_rotz(float input_pos[][3], float rot_z, float output_result[][3]);
 
     mat4 perspective(float fov, float aspect_ratio, float near, float far);
 
