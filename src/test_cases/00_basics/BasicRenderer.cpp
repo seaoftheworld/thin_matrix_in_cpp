@@ -4,6 +4,24 @@ bool BasicRenderer::getEntityShaderStatus() {
     return entityShaderLinked;
 }
 
+void BasicRenderer::specificSettingsOn() {
+    glClearColor(0.7f, 0.7f, 0.8f, 1.0f);
+    glEnable(GL_DEPTH_TEST);
+    // glDepthFunc(GL_LESS);
+
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    glEnable(GL_MULTISAMPLE); // Usually enabled by default in driver
+
+    // glEnable(GL_CULL_FACE);  // requried the model to be enclosed, otherwise
+    // glCullFace(GL_BACK);     // will not be correctly displayed ???
+    // glCullFace(GL_FRONT);
+}
+
+void BasicRenderer::specificSettingsOff() {
+}
+
 void BasicRenderer::allocEntityShader() {
 
     StaticShader *shader = new StaticShader;
@@ -20,8 +38,8 @@ void BasicRenderer::allocEntityShader() {
         entityShaderLinked = false;
     }
 
-    entityShader = dynamic_cast<BaseShader *>(shader);
     entityShaderLinked = true;
+    entityShader = shader;
 
     // load projection matrix for the only once
     entityShader->start();
@@ -35,9 +53,7 @@ void BasicRenderer::cleanUp() {
         entityShader->stop();
         entityShader->cleanUp();
 
-        StaticShader *shader = dynamic_cast<StaticShader *>(entityShader);
-        delete shader;
-
+        delete entityShader;
         entityShader = NULL;
     }
 

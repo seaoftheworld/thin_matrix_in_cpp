@@ -39,19 +39,10 @@ int test_01_specular_lighting() {
         win.stop();
         return -1;
     }
-
+    renderer.specificSettingsOn();
     Loader loader;
 
-    //*
     AssimpLib assimp_misa; {
-        // float info[Entity::transform::max] = {
-        //             0.0f, 0.0f, 0.0f,
-        //             3.14f / 2.0f, 0.0f, 0.0f,
-        //             0.05f
-        // };
-        // EntityInfo transform(&info);
-        // assimp_misa.loadModel("data/models/qp_01/qp_01.obj", transform, loader);
-
         // float info[Entity::transform::max] = {
         //             0.0f, 0.0f, 0.0f,
         //             0.0f, 0.0f, 0.0f,
@@ -63,31 +54,22 @@ int test_01_specular_lighting() {
         // float info[Entity::transform::max] = {
         //             0.0f, 0.0f, 0.0f,
         //             3.14f / 2.0f, 0.0f, 0.0f,
-        //             1.0f
+        //             4.0f
         // };
         // EntityInfo transform(&info);
-        // assimp_misa.loadModel("data/models/garbage_contain/Garbage_Container_.obj", transform, loader);
+        // assimp_misa.loadModel("data/models/gun/Handgun_obj.obj", transform, loader);
 
         float info[Entity::transform::max] = {
                     0.0f, 0.0f, 0.0f,
+                    // 0.0f, 0.0f, 3.14f / 2.0f,
                     0.0f, 0.0f, 0.0f,
                     1.0f
         };
         Transform transform(&info);
         Transform *transforms[] = { &transform };
 
-        // TODO: load model with multi transform info
         assimp_misa.loadModel("data/models/misa/misa_yForward_zUp.obj", loader, transforms, 1);
-
-        // float info[Entity::transform::max] = {
-        //             0.0f, 0.0f, 0.0f,
-        //             3.14f / 2.0f, 0.0f, 0.0f,
-        //             4.0f
-        // };
-        // EntityInfo transform(&info);
-        // assimp_misa.loadModel("data/models/gun/Handgun_obj.obj", transform, loader);
     }
-    //*/
 
     Entity single_vbo_entity;
     Entity multi_vbo_entity; 
@@ -154,7 +136,7 @@ int test_01_specular_lighting() {
 
             {
                 float transform_values[Entity::transform::max] = {
-                    -2.0f, -2.0f, 0.0f,
+                    -5.0f, -5.0f, 1.0f,
                     0.0f, 0.0f, 0.0f,
                     4.0f
                 };
@@ -165,7 +147,7 @@ int test_01_specular_lighting() {
 
             {
                 float transform_values[Entity::transform::max] = {
-                    -0.5f, -0.5f, 2.0f,
+                    -5.0f, -5.0f, 2.0f,
                     0.0f, 0.0f, 0.0f,
                     1.0f
                 };
@@ -176,7 +158,6 @@ int test_01_specular_lighting() {
         }
 
         {
-            //*
             float test_pos[] = { -0.5f, 0.5f,  0.0f, 
                                   0.5f, 0.5f,  0.0f, 
                                   0.5f, -0.5f, 0.0f, 
@@ -187,9 +168,12 @@ int test_01_specular_lighting() {
                                 1.0f, 1.0f, 
                                 0.0f, 1.0f };
 
+            float dummy_normal[] = {0.0f, 0.0f, 0.0f};
+
             float *test_vertex_attr[] = {
                 test_pos, 
-                test_uv
+                test_uv,
+                dummy_normal
             };
 
             unsigned int test_vertices_count_from_pos = ARRAY_SIZE(test_pos) / SpecularShader::attr_stride[SpecularShader::id0_pos3f];
@@ -224,7 +208,6 @@ int test_01_specular_lighting() {
                 Transform transform(&values);
                 multi_vbo_entity.addTransform(transform);
             }
-            //*/
         }
     }
 
@@ -253,7 +236,6 @@ int test_01_specular_lighting() {
         light.setValues(&position, &color, &dummy_attenuation);
     }
 
-    // Camera cam(gl_math::vec3(0.0f, -2.0f, 2.0f), 0.0f, -3.14f / 4.0f);
     Camera cam(gl_math::vec3(-1.36f, 3.15f, 4.25f), 2.65f, -0.765f);
 
     // double prevFrameTime = 0;
@@ -314,38 +296,42 @@ int test_01_specular_lighting() {
             }
 
             {
-                // unsigned short et_idx = 0;
+                // unsigned short transform_idx = 0;
                 // float rot_z_step = 0.785f;
 
                 // static bool increase = false;
                 
                 // for (auto itr = assimp_misa.entities.begin(); itr != assimp_misa.entities.end(); itr++) {
                 //     float delta_rot_z = ( increase ) ? (rot_z_step) : (-rot_z_step);
-                //     (*itr).increaseRotation(et_idx, 0.0f, 0.0f, delta_rot_z);
+                //     (*itr).increaseRotation(transform_idx, 0.0f, 0.0f, delta_rot_z);
                 // }
 
-                // if ((*assimp_misa.entities[0].getInfo(et_idx))[Entity::transform::rot_z] > 3.14f) {
-                //     // printf("rot_z max: %f\n", (*assimp_misa.entities[0].getInfo(et_idx))[Entity::transform::rot_z]);
+                // if ((*assimp_misa.entities[0].getInfo(transform_idx))[Entity::transform::rot_z] > 3.14f) {
+                //     // printf("rot_z max: %f\n", (*assimp_misa.entities[0].getInfo(transform_idx))[Entity::transform::rot_z]);
                 //     increase = false;
                 // }
-                // else if ((*assimp_misa.entities[0].getInfo(et_idx))[Entity::transform::rot_z] < -3.14f) {
-                //     // printf("rot_z min: %f\n", (*assimp_misa.entities[0].getInfo(et_idx))[Entity::transform::rot_z]);
+                // else if ((*assimp_misa.entities[0].getInfo(transform_idx))[Entity::transform::rot_z] < -3.14f) {
+                //     // printf("rot_z min: %f\n", (*assimp_misa.entities[0].getInfo(transform_idx))[Entity::transform::rot_z]);
                 //     increase = true;
                 // }
-            }
-
-            {
-                printf("  __ 1s: %d fps\n", fps);
-                fps = 0;
             }
 
             if (stop) {
                 static unsigned char i = 0;
                 i++;
+                // printf("\n\n");
+                // printf("  __ stop is 1\n", i);
+                // printf("  __ i is %d\n", i);
                 if (i > 0) {
                     stop = false;
                     i = 0;
+                    // printf("  __ stop is 0 now\n\n", i);
                 }
+            }
+
+            {
+                printf("  __ 1s: %d fps\n", fps);
+                fps = 0;
             }
         }
 
@@ -364,8 +350,7 @@ int test_01_specular_lighting() {
 
         // Update data (view-mat) according to input, update entity pos, rot, scale...
         // if ( now - last_update_time >= update_cycle ) {
-        if (1) {
-            
+        {   
             win.pollEvents();  // not respond when close win with mouse without this
             
             cam.input_update(win);
@@ -377,29 +362,44 @@ int test_01_specular_lighting() {
             // entity.increaseRotation(0.0f, 0.0f, 0.005f);
 
             {
-                unsigned short et_idx = 0;
-                float rot_z_step = 0.016f;
+                unsigned short transform_idx = 0;
+                float rot_z_step = 0.048f;
 
-                static bool increase = false;
+                static bool facing_left = true;
+                static bool turn_back = false;
 
                 if (!stop) {
-                    float delta_rot_z = ( increase ) ? (rot_z_step) : (-rot_z_step);
+                    float delta_rot_z = ( facing_left ) ? (rot_z_step) : (-rot_z_step);
+                    delta_rot_z = (turn_back) ? (-delta_rot_z) : (delta_rot_z);
                     
                     for (auto itr = assimp_misa.entities.begin(); itr != assimp_misa.entities.end(); itr++) {
-                        itr->increaseRotation(et_idx, 0.0f, 0.0f, delta_rot_z);
+                        itr->increaseRotation(transform_idx, 0.0f, 0.0f, delta_rot_z);
                         // itr->setRotZ(0, 3.14f);
                     }
 
-                    if ((*assimp_misa.entities[0].getTransformValues(et_idx))[Entity::transform::rot_z] > 3.14f) {
-                        printf("rot_z max: %f\n", (*assimp_misa.entities[0].getTransformValues(et_idx))[Entity::transform::rot_z]);
-                        increase = false;
-                        stop = true;
+                    Entity *misaEntity = &assimp_misa.entities[0];
+                    float misa_angle = (*(misaEntity->getTransformValues(transform_idx)))[Entity::transform::rot_z];
+
+                    if (!turn_back) {
+                        if (facing_left && misa_angle > 3.14f + 3.14f / 4.0f) {
+                            printf("rot_z max: %f\n", misa_angle);
+                            turn_back = true;
+                            // stop = true;
+                        }
+                        else if (!facing_left && misa_angle < -3.14f - 3.14f / 4.0f) {
+                            printf("rot_z min: %f\n", misa_angle);
+                            turn_back = true;
+                            // stop = true;
+                        }
                     }
-                    else if ((*assimp_misa.entities[0].getTransformValues(et_idx))[Entity::transform::rot_z] < -3.14f) {
-                        printf("rot_z min: %f\n", (*assimp_misa.entities[0].getTransformValues(et_idx))[Entity::transform::rot_z]);
-                        increase = true;
-                        stop = true;
+                    else {
+                        if (misa_angle > -rot_z_step && misa_angle < rot_z_step) {
+                            turn_back = false;
+                            facing_left = (!facing_left);
+                            stop = true;
+                        }
                     }
+                    
                 }
             }
 

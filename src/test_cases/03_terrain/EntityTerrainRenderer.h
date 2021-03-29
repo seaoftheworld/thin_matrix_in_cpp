@@ -1,22 +1,23 @@
 #include "Core/Renderer.h"
-#include "Core/Shader/SpecularShader.h"
+#include "Core/Shader/SpecularShader.h"  // Terrain shader is now copied from specular shader
+#include "Core/Shader/TerrainShader.h"
 
-class SpecularRenderer : public HighLevelRenderer {
+class EntityTerrainRenderer : public HighLevelRenderer {
 public:
-    SpecularRenderer() {
-        printf("  __ specular-renderer constructor called.\n");
+    EntityTerrainRenderer() {
+        printf("  __ entity-terrain-renderer constructor called.\n");
         cleanUp();
         allocEntityShader();
     }
-    ~SpecularRenderer() {
-        printf("  __ specular-renderer destructor called.\n");
+    ~EntityTerrainRenderer() {
+        printf("  __ entity-terrain-renderer destructor called.\n");
         cleanUp();
     }
 
     void allocEntityShader() override;  // only have to be called once before the rendering loop
     void cleanUp() override;
 
-    bool getEntityShaderStatus();
+    bool getEntityAndTerrainShaderStatus();
 
     void specificSettingsOff();
     void specificSettingsOn();
@@ -25,19 +26,31 @@ public:
         prepare();
             entityShader->start();
             entityShader->loadViewMatrix( getViewMatrix() );
-
-            SpecularShader *shader = entityShader;
-                shader->loadLight(light);
-                shader->loadReflectivity(20.0f);
-                shader->loadShineDamper(20.0f);
-
+            
+                entityShader->loadLight(light);
+                
+                entityShader->loadReflectivity(20.0f);
+                entityShader->loadShineDamper(20.0f);
                 unsigned int misa_start_idx = 0;
                 entityRendererWraper(misa_start_idx, misa_entities_num);
 
-                shader->loadReflectivity(10.0f);
-                shader->loadShineDamper(10.0f);
+                entityShader->loadReflectivity(10.0f);
+                entityShader->loadShineDamper(10.0f);
                 unsigned int the_rest_entities_start_idx = misa_entities_num;
                 entityRendererWraper(the_rest_entities_start_idx, total_entities_num - misa_entities_num);
+
+            terrainShader->start();
+            terrainShader->loadViewMatrix( getViewMatrix() );
+
+                terrainShader->loadLight(light);
+
+                terrainShader->loadReflectivity(20.0f);
+                terrainShader->loadShineDamper(20.0f);
+                terrainRendererWraper();
+    }
+
+    void addTerrain(Terrain *terrain) {
+        terrains.push_back(terrain);
     }
 
 private:
@@ -55,10 +68,27 @@ private:
         }
     }
 
+    // void terrainRendererWraper(unsigned int start_entity_idx, unsigned int num) {
+    void terrainRendererWraper() {
+        // if (start_entity_idx < getEntitiesSize()) {
+            // for (unsigned int i = start_entity_idx; i < terrains.size() && (i - start_entity_idx) < num; i++) {
+            for (unsigned int i = 0; i < terrains.size(); i++) {
+                auto terrain = terrains.begin() + i;
+                terrainRenderer.render(*terrain, terrainShader);
+            }
+        // }
+    }
+
+    TerrainShader *terrainShader = NULL;
+    bool terrainShaderLinked = false;
+    
     SpecularShader *entityShader = NULL;
     bool entityShaderLinked = false;
-
+    
+    TerrainRenderer terrainRenderer;
     EntityRenderer entityRenderer;
+
+    std::vector<Terrain *> terrains;
 };
 
 // // void process(Light &light) {

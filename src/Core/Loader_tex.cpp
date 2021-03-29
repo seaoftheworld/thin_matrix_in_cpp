@@ -150,7 +150,14 @@
             }
 
             if (comp == 3) {
-                if (!load_rgb_alpha_image(imgPaths[i], 0)) {
+                // TODO: For some png pictures taken by cellphone (no transparency), comp is still 4, 
+                // this could be displayed correctly with alpha set;
+                // but for some other png, comp is 3, and, if alpha is set to 0 in this case,
+                // the displayed color is not correct,
+                // set alpha to 1 for all situations ???
+                // 
+                // if (!load_rgb_alpha_image(imgPaths[i], 0)) {  
+                if (!load_rgb_alpha_image(imgPaths[i], 1)) {
                     destroyTex(num, texIds);
                     return 0;
                 }

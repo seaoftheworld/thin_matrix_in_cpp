@@ -130,7 +130,7 @@ public:
     }
 
     // multi_vbos type (Array-of-structs)
-    static const unsigned short vboNum = 2;
+    static const unsigned short vboNum = 3;                 // pos, uv, normal
     static const unsigned short allBuffNum = (vboNum + 1);  // 2 vbos + 1 ibo
     
     static const unsigned int vbo_atrr_idx[vboNum];

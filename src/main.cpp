@@ -3,6 +3,7 @@
 int test_00_basics();
 int test_01_specular_lighting();
 int test_02_multi_lighting();
+int test_03_terrain();
 
 int main() {
     
@@ -36,6 +37,11 @@ int main() {
             case 2:
                 result = test_02_multi_lighting();
                 // run = false;
+            break;
+
+            case 3:
+                result = test_03_terrain();
+                run = false;
             break;
 
             case 999:

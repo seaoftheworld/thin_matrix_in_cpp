@@ -8,7 +8,9 @@
 
 #include "Common/gl_header.h"
 #include "Common/gl_math.h"
+
 #include "Common/data.h"
+#include "Terrain.h"
 
 #include <iostream>
 
@@ -86,9 +88,9 @@ public:
     void render(Entity *entity, BaseShader *shader);
 };
 
-class TrnRenderer {
+class TerrainRenderer {
 public:
-    void render() {}
+    void render(Terrain *terrain, BaseShader *shader);
 };
 
 class HighLevelRenderer {
@@ -167,12 +169,12 @@ public:
         return entities;
     }
 
-public:
-    BaseShader *entityShader = NULL;
-
 private:
     gl_math::mat4 projection_matrix = gl_math::mat4(1.0f);
     gl_math::mat4 view_matrix = gl_math::mat4(1.0f);
 
     std::vector<Entity *> entities;
+
+    // pointer to specific shaders from derived class
+    // object of specific renders from derived class
 };

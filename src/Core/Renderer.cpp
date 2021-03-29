@@ -146,6 +146,88 @@ void EntityRenderer::render(Entity *entity, BaseShader *shader) {
     }
 }
 
+void TerrainRenderer::render(Terrain *terrain, BaseShader *shader) {
+    // shader->start();
+    if (!terrain || !shader) {
+        return;
+    }
+
+    // Setting this to be 0 could make drawing unable to crash the program,
+    // when NULL-texture/model pointers are input by mistake.
+    unsigned int indices_count = 0;
+
+    StaticTexture *static_texture = terrain->getTexture();
+    BaseModel *static_model = terrain->getModel();
+
+    if (static_texture) {
+        // bind a texture buffer object
+        int texture_id = static_texture->getId();
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, texture_id);
+    }
+
+    if (static_model) {
+        switch (static_model->getModelType()) {
+            // Terrain's model is now generated as multi-vbos model
+            case BaseModel::multi_vbos:
+            {
+                // TODO: casting is no longer necessary here
+                indices_count = ((StaticModel *)static_model)->getNumIndices();
+
+                int vbos_ibo_ids[StaticModel::allBuffNum];
+                ((StaticModel *)static_model)->getBuffers(&vbos_ibo_ids);
+
+                // bind vbo, enable its corresponding-attribute in v-shader (pos, uv, or normal), then
+                // set how to interpretate vbo data into the attribute.
+                for (unsigned int i = 0; i < StaticModel::vboNum; i++) {
+                    glBindBuffer(GL_ARRAY_BUFFER, vbos_ibo_ids[i]);
+                    
+                    glEnableVertexAttribArray(StaticModel::vbo_atrr_idx[i]);
+                    
+                    glVertexAttribPointer(
+                        StaticModel::vbo_atrr_idx[i], 
+                        StaticModel::vbo_stride[i], GL_FLOAT, 
+                        GL_FALSE, 
+                        StaticModel::vbo_stride[i] << 2,  // N-floats * 4 ==> stride in bytes (N = 3, 2, ...)
+                        0);
+                }
+
+                // bind the ibo
+                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbos_ibo_ids[StaticModel::vboNum] );
+            }
+            break;
+
+            default:
+            break;
+        }
+    }
+
+    // set the model-matrix uniform for the shaders before drawing the terrain
+    {
+        float terrain_model_matrix[Entity::transform::max] = {
+            terrain->getXOffset(), terrain->getYOffset(), 0.0f, 
+            0.0f, 0.0f, 0.0f, 
+            1.0f
+        };
+
+        gl_math::mat4 model_matrix;
+        gl_math::model_matrix_SRT_Normal(&terrain_model_matrix, &model_matrix);
+
+        // Proj-Matrix and View-Matrix should have been loaded before 
+        // reaching here
+        shader->loadTransformMatrix(&model_matrix[0][0]);
+        
+        // Draw the triangles
+        // printf("draw: %d\n\n", indices_count);
+        glDrawElements(
+            GL_TRIANGLES,      // mode
+            indices_count,     // num of indices
+            GL_UNSIGNED_SHORT, // type
+            0                  // element array buffer(indices buffer) offset
+        );
+    }
+}
+
 void Camera::input_update(WindowSystem &win) {
     // glfwGetTime is called only once for lastTime (the first time this function is called)
     //

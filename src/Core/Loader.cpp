@@ -180,7 +180,7 @@ StaticModel *Loader::allocStaticModelFromBuffers(int input_vbos_ibo_ids[][Static
 //              1 int[] for indices (sequences of vertices)
 //      3 vbos + 1 ibo
 //
-StaticModel * Loader::loadStaticModel(
+StaticModel *Loader::loadStaticModel(
     float *input_attr_data[][StaticModel::vboNum], unsigned int vertex_count,
     unsigned short *input_indices_data, unsigned int indices_count) {
     

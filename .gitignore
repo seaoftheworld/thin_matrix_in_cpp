@@ -14,6 +14,6 @@ building_output__/*
 
 
 # files
-# .gitignore
 zygote_gl_proj.vcxproj.user
-intro__.txt
+notes__.txt
+.gitignore

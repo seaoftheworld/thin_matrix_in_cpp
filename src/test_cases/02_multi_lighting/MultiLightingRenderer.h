@@ -17,14 +17,16 @@ public:
     void cleanUp() override;
 
     bool getEntityShaderStatus();
+
+    void specificSettingsOff();
+    void specificSettingsOn();
     
     void process(Light *input_lights, unsigned int input_num_lights, unsigned int misa_entities_num, unsigned int total_entities_num) {
         prepare();
             entityShader->start();
             entityShader->loadViewMatrix( getViewMatrix() );
 
-            MultiLightsShader *shader = dynamic_cast<MultiLightsShader *>(entityShader);
-
+            MultiLightsShader *shader = entityShader;
                 // printf("loadMultiLights(), use invalid pointers could crash !!! \n");
                 shader->loadLights(input_lights, input_num_lights);
 
@@ -54,8 +56,8 @@ private:
         }
     }
 
-    EntityRenderer entityRenderer;
-    // TrnRenderer    trnRenderer;
-
+    MultiLightsShader *entityShader = NULL;
     bool entityShaderLinked = false;
+
+    EntityRenderer entityRenderer;
 };

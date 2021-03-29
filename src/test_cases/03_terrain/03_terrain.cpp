@@ -6,8 +6,7 @@
 #define __USE_INLINE_METHODS__
 #include "WindowSystem/WindowSystem.h"
 
-#include "test_cases/02_multi_lighting/MultiLightingRenderer.h"
-#include "LightsPositionData.h"
+#include "EntityTerrainRenderer.h"
 #include "Core/Loader.h"
 
 #include "Core/AssimpLib.h"
@@ -15,9 +14,9 @@
 #include <iostream>
 #include <stdio.h>
 
-int test_02_multi_lighting() {
+int test_03_terrain() {
 
-    printf("  __ 02 multi lighting __\n");
+    printf("  __ 03 terrain __\n");
 
     WindowSystem &win = WindowSystem::instance();
     if (win.start() < 0) {
@@ -33,82 +32,16 @@ int test_02_multi_lighting() {
     }
 
     // ---------------------------------
-    MultiLightsRenderer renderer;
-    if (!renderer.getEntityShaderStatus()) {
+    EntityTerrainRenderer renderer;
+    if (!renderer.getEntityAndTerrainShaderStatus()) {
         // loading/compiling/linking shader-program failed
         renderer.cleanUp();
         win.stop();
         return -1;
     }
     renderer.specificSettingsOn();
+
     Loader loader;
-
-    LightsPositionData lightsPositionData;
-    Light lights[NUM_LIGHTS]; {
-        float light_color[NUM_LIGHTS][Light::Color::max_color] = {
-            { 1.8f, 1.0f, 1.8f },  // pink
-                // float color[Light::max_color] = { 2.0f, 0.0f, 0.0f };         // red
-                // float light_color0[Light::max_color] = { 0.0f, 2.0f, 0.0f };  // green
-                // float light_pos0[Light::max_pos] = {0.0f, 1.0f, 2.0f};
-                // float light_color0[Light::max_color] = { 0.0f, 0.0f, 0.0f };  // none
-            { 1.0f, 2.6f, 1.0f },  // green
-            { 1.8f, 1.8f, 1.0f },  // red + green ==> yellow
-            { 0.6f, 0.6f, 2.2f }   // blue
-        };
-
-        float default_att[Light::max_att] = { 1.0f, 0.3f, 0.4f };
-
-        for (unsigned int i = 0; i < NUM_LIGHTS; i++) {
-            lights[i].setValues(lightsPositionData.getPosition(i), &light_color[i], &default_att);
-        }
-    }
-
-    // 4 crates represents the positions of 4 lights
-    AssimpLib assimp_crate; {
-
-        // Modify the 4 init-transforms of the crate-entity
-        // in the following lines:
-        float crate_transform_values[NUM_LIGHTS][Entity::transform::max];
-        for (unsigned int i = 0; i < NUM_LIGHTS; i++) {
-            const float crate_scale = 0.12f;
-            
-            crate_transform_values[i][Entity::transform::x] = (*lightsPositionData.getPosition(i))[Light::Position::x];
-            crate_transform_values[i][Entity::transform::y] = (*lightsPositionData.getPosition(i))[Light::Position::y];
-            crate_transform_values[i][Entity::transform::z] = (*lightsPositionData.getPosition(i))[Light::Position::z];
-            crate_transform_values[i][Entity::transform::rot_x] = 0.0f;
-            crate_transform_values[i][Entity::transform::rot_y] = 0.0f;
-            crate_transform_values[i][Entity::transform::rot_z] = 0.0f; 
-            crate_transform_values[i][Entity::transform::scale] = crate_scale;
-        }
-
-        Transform crate_transforms[NUM_LIGHTS]; {
-            for (unsigned int i = 0; i < NUM_LIGHTS; i++) {
-                crate_transforms[i].values[Transform::x] = crate_transform_values[i][Entity::transform::x];
-                crate_transforms[i].values[Transform::y] = crate_transform_values[i][Entity::transform::y];
-                crate_transforms[i].values[Transform::z] = crate_transform_values[i][Entity::transform::z];
-                crate_transforms[i].values[Transform::rot_x] = crate_transform_values[i][Entity::transform::rot_x];
-                crate_transforms[i].values[Transform::rot_y] = crate_transform_values[i][Entity::transform::rot_y];
-                crate_transforms[i].values[Transform::rot_z] = crate_transform_values[i][Entity::transform::rot_z];
-                crate_transforms[i].values[Transform::scale] = crate_transform_values[i][Entity::transform::scale];
-            }
-        }
-
-        Transform *p_crate_transforms[NUM_LIGHTS]; {
-            for (unsigned int i = 0; i < NUM_LIGHTS; i++) {
-                p_crate_transforms[i] = &crate_transforms[i];
-            }
-        };
-
-        assimp_crate.loadModel( "data/models/crate/Crate1.obj", loader, p_crate_transforms, NUM_LIGHTS );
-
-        // Doesnt work before shader is bound/opened/started .... !!!
-        // multiLightsShader.loadLights(&light_pos[0], &light_color[0], 4);
-
-        // printf("4 lights inited and crate model loaded, press anything to continue ...\n\n"); {
-        //     int dbg;
-        //     scanf("%d", &dbg);
-        // }
-    }
 
     AssimpLib assimp_misa; {
 
@@ -200,6 +133,7 @@ int test_02_multi_lighting() {
                 single_vbo_entity.addTransform(trans_big_square);
 
                 float trans_small_square_values[Entity::transform::max] = {
+                    // -1.5f, -1.5f, 2.0f,
                     -5.0f, -5.0f, 2.0f,
                     0.0f, 0.0f, 0.0f,
                     1.0f
@@ -231,8 +165,8 @@ int test_02_multi_lighting() {
                 dummy_normal
             };
 
-            unsigned int test_vertices_count_from_pos = ARRAY_SIZE(test_pos) / MultiLightsShader::attr_stride[MultiLightsShader::id0_pos3f];
-            unsigned int test_vertices_count_from_uv = ARRAY_SIZE(test_uv) / MultiLightsShader::attr_stride[MultiLightsShader::id1_uv2f];
+            unsigned int test_vertices_count_from_pos = ARRAY_SIZE(test_pos) / SpecularShader::attr_stride[SpecularShader::id0_pos3f];
+            unsigned int test_vertices_count_from_uv = ARRAY_SIZE(test_uv) / SpecularShader::attr_stride[SpecularShader::id1_uv2f];
 
             unsigned short test_indices[] = { 0, 1, 2, 0, 3, 2 };
 
@@ -282,9 +216,6 @@ int test_02_multi_lighting() {
         for (auto misa_entity = assimp_misa.entities.begin(); misa_entity != assimp_misa.entities.end(); misa_entity++) {
             renderer.addEntity( &(*misa_entity) );
         }
-        for (auto crate_entity = assimp_crate.entities.begin(); crate_entity != assimp_crate.entities.end(); crate_entity++) {
-            renderer.addEntity( &(*crate_entity) );
-        }
 
         renderer.addEntity(&single_vbo_entity);
         renderer.addEntity(&multi_vbo_entity);
@@ -293,8 +224,26 @@ int test_02_multi_lighting() {
         printf("  __num of meshes for misa/all: %d, %d\n", num_misa_entities, num_all_entities);
     }
 
-    // Camera cam(gl_math::vec3(-1.93f, 2.4f, 3.9f), 0.0f, -3.14f / 4.0f);
-    // Camera cam(gl_math::vec3(-1.93f, 2.4f, 3.9f), 2.68f, -0.7f);
+    {
+        std::string terrainTexturePath = "data/tex/grass_summer.png";
+        StaticTexture *terrainTexture = NULL;
+        loader.loadStaticTextures(&terrainTexturePath, 1, &terrainTexture);
+
+        Terrain terrain00(&loader, terrainTexture, -1, -1); 
+        // Terrain terrain01(&loader, terrainTexture, 0, 1); 
+        {
+            renderer.addTerrain(&terrain00);
+            // renderer.addTerrain(&terrain01);
+        }
+    }
+
+    Light light; {
+        float position[Light::Position::max_pos] = {0.0f, 1.0f, 2.0f};
+        float color[Light::Color::max_color] = {1.6f, 1.2f, 1.6f};
+        float dummy_attenuation[Light::Attenuation::max_att] = {0.0f, 0.0f, 0.0f};
+        light.setValues(&position, &color, &dummy_attenuation);
+    }
+
     Camera cam(gl_math::vec3(-1.36f, 3.15f, 4.25f), 2.65f, -0.765f);
 
     // double prevFrameTime = 0;
@@ -420,74 +369,6 @@ int test_02_multi_lighting() {
             // entity.increaseRotation(0.0f, 0.0005f, 0.0f);
             // entity.increaseRotation(0.0f, 0.0f, 0.005f);
 
-            // Update the 4 lights according to positions of the 4 crates
-            {
-                // The 1st and the only entity in 'assimp_crate' is the crate model with 4 transforms
-                Entity *crate = &(assimp_crate.entities[0]);
-
-                // float rot_z_step = 0.032f;
-                // float xy_step = 0.048f;
-
-                // enum Move {
-                //     rotate = 0, 
-                //     crate0_get_closer, crate0_get_further, 
-                //     crate3_get_closer, crate3_get_further, 
-                //     crate2_get_closer, crate2_get_further, 
-                //     crate1_get_closer, crate1_get_further, 
-                //     max
-                // };
-                // static Move move = rotate;
-                // static float curr_rot_z = 0.0f;
-
-                // 1. update crate's 4 transforms
-                if (!stop) {
-                    // MultiLighsData::MoveType move_type_before = lightsPositionData.getMoveType();
-                    lightsPositionData.update();
-                    // MultiLighsData::MoveType move_type_after = lightsPositionData.getMoveType();
-                    // if (move_type_before != move_type_after) {
-                    //     stop = true;
-                    // }
-
-                    unsigned int offsets[] = {
-                        Entity::transform::x, Entity::transform::y,
-                        Entity::transform::z, Entity::transform::rot_z
-                    };
-
-                    XYZRotz xyz_rotz;
-
-                    // Update each transform for the crate entiry
-                    for (unsigned int i = 0; i < NUM_LIGHTS; i++) {
-
-                        lightsPositionData.getPosRotz(i, &xyz_rotz);
-
-                        // Revize the xyz info according to rot-z, the xyz from UpdatePosRotz
-                        // is not rotated, rotation info is only in rotz value
-                        gl_math::get_xyz_from_rotz(&xyz_rotz.pos, xyz_rotz.rot, &xyz_rotz.pos);
-
-                        crate->setTransformValues(i, xyz_rotz.pos, offsets, ARRAY_SIZE(offsets));
-                    }
-                }
-
-                // 2. update 4 lights' positions according to crate's 4 transforms
-                {
-                    float updated_light_pos[NUM_LIGHTS][Light::Position::max_pos];
-                    for (unsigned int i = 0; i < NUM_LIGHTS; i++) {
-                        for (unsigned int j = 0; j < 3; j++) {
-                            updated_light_pos[i][j] = (*(crate->getTransformValues(i)))[Entity::transform::x + j];
-                        }
-                    }
-                    
-                    for (unsigned int i = 0; i < NUM_LIGHTS; i++) {
-                        lights[i].setPosition(&updated_light_pos[i]);
-                    }
-                }
-
-                // 3. write the 4 lights' pos, color, and attenuation into variables to be used
-                //    by the multi-lights shader
-                // TODO: use something like 'addLight()' dynamically 
-                // instead of manually adding lights every time before rendering. {}
-            }
-
             /*
             // Updating misa model
             {
@@ -526,7 +407,7 @@ int test_02_multi_lighting() {
         // Render entities
         // if ( now - last_render_time >= render_cycle ) {
         {
-            renderer.process(lights, ARRAY_SIZE(lights), num_misa_entities, num_all_entities);
+            renderer.process(light, num_misa_entities, num_all_entities);
 
             last_render_time = now;
             rendered_times++;
@@ -536,13 +417,9 @@ int test_02_multi_lighting() {
         fps++;
     }
 
-    for (auto itr = assimp_crate.entities.begin(); itr != assimp_crate.entities.end(); itr++) {
-        itr->cleanUp();
+    for (auto misa_entity = assimp_misa.entities.begin(); misa_entity != assimp_misa.entities.end(); misa_entity++) {
+        misa_entity->cleanUp();
     }
-    for (auto itr = assimp_misa.entities.begin(); itr != assimp_misa.entities.end(); itr++) {
-        itr->cleanUp();
-    }
-    assimp_crate.cleanUp();
     assimp_misa.cleanUp();
 
     single_vbo_entity.cleanUp();

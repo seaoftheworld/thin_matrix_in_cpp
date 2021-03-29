@@ -18,6 +18,9 @@ public:
 
     bool getEntityShaderStatus();
 
+    void specificSettingsOff();
+    void specificSettingsOn();
+
     void prepare() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         entityShader->start();
@@ -25,9 +28,7 @@ public:
     }
     
     void process(Entity *entity) {
-
-            StaticShader *shader = dynamic_cast<StaticShader *>(entityShader);
-                entityRendererWraper(entity);
+        entityRendererWraper(entity);
     }
 
 private:
@@ -35,6 +36,8 @@ private:
         entityRenderer.render(entity, entityShader);
     }
 
-    EntityRenderer entityRenderer;
     bool entityShaderLinked = false;
+    StaticShader *entityShader = NULL;
+
+    EntityRenderer entityRenderer;
 };
