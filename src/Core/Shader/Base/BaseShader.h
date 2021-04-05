@@ -132,6 +132,10 @@ public:
             }
         }
 
+        void uniform1i(int location, int input) {
+            glUniform1i((GLint)location, (GLint)input);
+        }
+
         void uniform1f(int location, float f0) {
             glUniform1f((GLint)location, (GLfloat)f0);
         }

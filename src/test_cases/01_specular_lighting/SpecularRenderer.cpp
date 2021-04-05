@@ -22,7 +22,7 @@ void SpecularRenderer::specificSettingsOn() {
 void SpecularRenderer::specificSettingsOff() {
 }
 
-void SpecularRenderer::allocEntityShader() {
+void SpecularRenderer::allocShaders() {
 
     SpecularShader *shader = new SpecularShader;
 

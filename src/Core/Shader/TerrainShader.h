@@ -31,6 +31,20 @@ public:
     void bindAllAttributeLocations() override;
     void getAllUniformLocations() override;
 
+    void bindTextureUnits() {
+        // uniform1i(texture00_sampler_loc, GL_TEXTURE0);
+        // uniform1i(texture01_sampler_loc, GL_TEXTURE1);
+        // uniform1i(texture02_sampler_loc, GL_TEXTURE2);
+        // uniform1i(texture03_sampler_loc, GL_TEXTURE3);
+        // uniform1i(blendMap_sampler_loc, GL_TEXTURE4);
+
+        uniform1i(texture00_sampler_loc, 0);
+        uniform1i(texture01_sampler_loc, 1);
+        uniform1i(texture02_sampler_loc, 2);
+        uniform1i(texture03_sampler_loc, 3);
+        uniform1i(blendMap_sampler_loc, 4);
+    }
+
     void loadLight(Light &light) {
         uniform3fv(lightPosition_loc, 1, light.getPosition3fv());
         uniform3fv(lightColor_loc, 1, light.getColor3fv());
@@ -54,6 +68,12 @@ private:
 
         objReflect_loc = -1,
         objShineDamper_loc = -1;
+
+    int texture00_sampler_loc = -1, 
+        texture01_sampler_loc = -1, 
+        texture02_sampler_loc = -1, 
+        texture03_sampler_loc = -1, 
+        blendMap_sampler_loc = -1;
     
     // TODO: tobe moved into the init() for the corresponding renderer
     void specificSettingsOn() {

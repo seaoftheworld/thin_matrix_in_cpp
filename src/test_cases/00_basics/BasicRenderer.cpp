@@ -22,7 +22,7 @@ void BasicRenderer::specificSettingsOn() {
 void BasicRenderer::specificSettingsOff() {
 }
 
-void BasicRenderer::allocEntityShader() {
+void BasicRenderer::allocShaders() {
 
     StaticShader *shader = new StaticShader;
 

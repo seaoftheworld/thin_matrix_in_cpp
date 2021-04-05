@@ -32,7 +32,7 @@ int test_03_terrain() {
     }
 
     // ---------------------------------
-    EntityTerrainRenderer renderer;
+    VersatileRenderer renderer;
     if (!renderer.getEntityAndTerrainShaderStatus()) {
         // loading/compiling/linking shader-program failed
         renderer.cleanUp();
@@ -40,8 +40,93 @@ int test_03_terrain() {
         return -1;
     }
     renderer.specificSettingsOn();
-
     Loader loader;
+
+    Terrain terrain; {
+        
+        TerrainTexture terrainTexture00; {
+            std::string terrainTexturePath = "data/tex/terrain/grassy2.png";
+            StaticTexture *terrainTexture = NULL;
+
+            loader.loadStaticTextures(&terrainTexturePath, 1, &terrainTexture);
+            terrainTexture00.init(terrainTexture->getId());
+        }
+
+        TerrainTexture terrainTexture01; {
+            std::string terrainTexturePath = "data/tex/terrain/mud.png";
+            StaticTexture* terrainTexture = NULL;
+
+            loader.loadStaticTextures(&terrainTexturePath, 1, &terrainTexture);
+            terrainTexture01.init(terrainTexture->getId());
+        }
+
+        TerrainTexture terrainTexture02; {
+            std::string terrainTexturePath = "data/tex/terrain/grassFlowers.png";
+            StaticTexture* terrainTexture = NULL;
+
+            loader.loadStaticTextures(&terrainTexturePath, 1, &terrainTexture);
+            terrainTexture02.init(terrainTexture->getId());
+        }
+
+        TerrainTexture terrainTexture03; {
+            std::string terrainTexturePath = "data/tex/terrain/path.png";
+            StaticTexture* terrainTexture = NULL;
+
+            loader.loadStaticTextures(&terrainTexturePath, 1, &terrainTexture);
+            terrainTexture03.init(terrainTexture->getId());
+        }
+
+        TerrainTexturePack texturePack; {
+            texturePack.init(terrainTexture00, terrainTexture01, terrainTexture02, terrainTexture03);
+        }
+
+        TerrainTexture blendmap; {
+            std::string terrainTexturePath = "data/tex/terrain/blendmap.png";
+            StaticTexture *terrainTexture = NULL;
+
+            loader.loadStaticTextures(&terrainTexturePath, 1, &terrainTexture);
+            blendmap.init(terrainTexture->getId());
+        }
+
+        terrain.init(&loader, 0, 0, texturePack, blendmap, "data/tex/terrain/height_map/heightmap.png");
+
+        printf("grass tex id: %d.\n", terrain.getTexturePack()->getTerrainTexture00()->getTextureID());
+        printf("  mud tex id: %d.\n", terrain.getTexturePack()->getTerrainTexture01()->getTextureID());
+        printf("flowertex id: %d.\n", terrain.getTexturePack()->getTerrainTexture02()->getTextureID());
+        printf(" path tex id: %d.\n", terrain.getTexturePack()->getTerrainTexture03()->getTextureID());
+        printf("blend tex id: %d.\n", terrain.getBlendMap()->getTextureID());
+        renderer.addTerrain(&terrain);
+
+        printf("terrain init done, press anything to continue ...\n\n"); {
+            int dbg;
+            scanf("%d", &dbg);
+
+            if (dbg == 0) {
+                renderer.cleanUp();
+                loader.cleanUp();
+                win.stop();
+                return 0;
+            }
+        }
+    }
+
+    {
+        std::string cloudySky[] = {
+            "data/tex/sky/right.png", 
+            "data/tex/sky/left.png", 
+            "data/tex/sky/back.png", 
+            "data/tex/sky/front.png",
+            "data/tex/sky/top.png", 
+            "data/tex/sky/bottom.png"
+        };
+        Skybox sky(&loader, &cloudySky, 50);
+        renderer.setSkybox(&sky);
+
+        printf("skybox init done, press anything to continue ...\n\n"); {
+            int dbg;
+            scanf("%d", &dbg);
+        }
+    }
 
     AssimpLib assimp_misa; {
 
@@ -224,22 +309,23 @@ int test_03_terrain() {
         printf("  __num of meshes for misa/all: %d, %d\n", num_misa_entities, num_all_entities);
     }
 
-    {
-        std::string terrainTexturePath = "data/tex/grass_summer.png";
-        StaticTexture *terrainTexture = NULL;
-        loader.loadStaticTextures(&terrainTexturePath, 1, &terrainTexture);
+    // {
+    //     std::string terrainTexturePath = "data/tex/grass_summer.png";
+    //     StaticTexture *terrainTexture = NULL;
+    //     loader.loadStaticTextures(&terrainTexturePath, 1, &terrainTexture);
 
-        Terrain terrain00(&loader, terrainTexture, -1, -1); 
-        // Terrain terrain01(&loader, terrainTexture, 0, 1); 
-        {
-            renderer.addTerrain(&terrain00);
-            // renderer.addTerrain(&terrain01);
-        }
-    }
+    //     Terrain terrain00(&loader, terrainTexture, -1, -1); 
+    //     // Terrain terrain01(&loader, terrainTexture, 0, 1); 
+    //     {
+    //         renderer.addTerrain(&terrain00);
+    //         // renderer.addTerrain(&terrain01);
+    //     }
+    // }
 
     Light light; {
         float position[Light::Position::max_pos] = {0.0f, 1.0f, 2.0f};
-        float color[Light::Color::max_color] = {1.6f, 1.2f, 1.6f};
+        // float color[Light::Color::max_color] = {1.6f, 1.2f, 1.6f};
+        float color[Light::Color::max_color] = { 1.6f, 1.6f, 1.6f };
         float dummy_attenuation[Light::Attenuation::max_att] = {0.0f, 0.0f, 0.0f};
         light.setValues(&position, &color, &dummy_attenuation);
     }
@@ -417,6 +503,7 @@ int test_03_terrain() {
         fps++;
     }
 
+TOTAL_CLEANUP:
     for (auto misa_entity = assimp_misa.entities.begin(); misa_entity != assimp_misa.entities.end(); misa_entity++) {
         misa_entity->cleanUp();
     }
@@ -425,6 +512,7 @@ int test_03_terrain() {
     single_vbo_entity.cleanUp();
     multi_vbo_entity.cleanUp();
 
+PARTIAL_CLEANUP:
     renderer.cleanUp();
     loader.cleanUp();
     

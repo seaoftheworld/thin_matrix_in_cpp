@@ -92,6 +92,7 @@
     <ClCompile Include="src\Core\Renderer.cpp" />
     <ClCompile Include="src\Core\Shader\Base\BaseShader.cpp" />
     <ClCompile Include="src\Core\Shader\MultiLightsShader.cpp" />
+    <ClCompile Include="src\Core\Shader\SkyboxShader.cpp" />
     <ClCompile Include="src\Core\Shader\SpecularShader.cpp" />
     <ClCompile Include="src\Core\Shader\StaticShader.cpp" />
     <ClCompile Include="src\Core\Shader\TerrainShader.cpp" />

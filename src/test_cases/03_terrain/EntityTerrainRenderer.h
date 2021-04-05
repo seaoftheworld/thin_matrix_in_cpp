@@ -1,20 +1,22 @@
 #include "Core/Renderer.h"
+
 #include "Core/Shader/SpecularShader.h"  // Terrain shader is now copied from specular shader
 #include "Core/Shader/TerrainShader.h"
+#include "Core/Shader/SkyboxShader.h"
 
-class EntityTerrainRenderer : public HighLevelRenderer {
+class VersatileRenderer : public HighLevelRenderer {
 public:
-    EntityTerrainRenderer() {
+    VersatileRenderer() {
         printf("  __ entity-terrain-renderer constructor called.\n");
         cleanUp();
-        allocEntityShader();
+        allocShaders();
     }
-    ~EntityTerrainRenderer() {
+    ~VersatileRenderer() {
         printf("  __ entity-terrain-renderer destructor called.\n");
         cleanUp();
     }
 
-    void allocEntityShader() override;  // only have to be called once before the rendering loop
+    void allocShaders() override;  // only have to be called once before the rendering loop
     void cleanUp() override;
 
     bool getEntityAndTerrainShaderStatus();
@@ -47,10 +49,20 @@ public:
                 terrainShader->loadReflectivity(20.0f);
                 terrainShader->loadShineDamper(20.0f);
                 terrainRendererWraper();
+
+            if (sky) {
+                skyboxShader->start();
+                skyboxShader->loadSkyboxViewMatrix( getViewMatrix() );
+                    skyboxRenderer.render(sky);
+            }
     }
 
     void addTerrain(Terrain *terrain) {
         terrains.push_back(terrain);
+    }
+
+    void setSkybox(Skybox *input_sky) {
+        sky = input_sky;
     }
 
 private:
@@ -79,16 +91,17 @@ private:
         // }
     }
 
+    // TODO: only use 1 pionter to indicate shader status
     TerrainShader *terrainShader = NULL;
-    bool terrainShaderLinked = false;
-    
     SpecularShader *entityShader = NULL;
-    bool entityShaderLinked = false;
+    SkyboxShader *skyboxShader = NULL;
     
     TerrainRenderer terrainRenderer;
     EntityRenderer entityRenderer;
+    SkyboxRenderer skyboxRenderer;
 
     std::vector<Terrain *> terrains;
+    Skybox *sky = NULL;
 };
 
 // // void process(Light &light) {

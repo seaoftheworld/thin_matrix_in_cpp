@@ -1,8 +1,8 @@
 uniform sampler2D texSampler;
 
 // Inputs
-uniform vec3 lightColor[8];
 uniform vec3 lightAttenuation[8];
+uniform vec3 lightColor[8];
 
 uniform float reflectivity;
 uniform float shineDamper;
@@ -10,15 +10,13 @@ uniform float shineDamper;
 // uniform float blendAlpha = 1.0f;
 // uniform float blendAlpha;
 
-// Passed in here from v-shader
+// From v-shader
 varying vec2 uv;
 
-varying vec3 vertexSurface;
 varying vec3 vertexToCamera;
+varying vec3 vertexSurface;
 
 varying vec3 vertexToLight[8];
-// varying vec3 vertexToLight0;
-// varying vec3 vertexToLight1;
 
 void main()
 {
@@ -47,17 +45,21 @@ void main()
     vec3 sum_specular = vec3(0.0);
 
     for (int i = 0; i < 8; i++) {
+    // for (int i = 0; i < 1; i++) {
         vec3 unit_VertexToLight = normalize(vertexToLight[i]);
         float lightDistance = length(vertexToLight[i]);
         float attFactor = lightAttenuation[i].x + lightDistance * lightAttenuation[i].y + lightDistance * lightDistance * lightAttenuation[i].z;
 
         float brightness = dot(unit_VertexSurface, unit_VertexToLight);
-            brightness = max(brightness, 0.0);
+            brightness = max(brightness, 0.2);
             sum_diffuse = sum_diffuse + brightness * lightColor[i] / attFactor;
 
+
             vec3 vertexReflectedLight = reflect(-unit_VertexToLight, unit_VertexSurface);
+                
                 float specularFactor = dot(vertexReflectedLight, unit_VertexToCamera);
                 specularFactor = max(specularFactor, 0.0);
+
                 float dampedFactor = pow(specularFactor, shineDamper);
                 sum_specular = sum_specular + dampedFactor * lightColor[i] / attFactor;
     }
@@ -92,7 +94,7 @@ void main()
         //     sum_diffuse = sum_diffuse + brightness * lightColor[1];
     }
 
-    sum_diffuse = max(sum_diffuse, 0.2);
+    // sum_diffuse = max(sum_diffuse, 0.2);
 
 
 

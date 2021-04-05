@@ -20,6 +20,10 @@ namespace gl_math {
         printf("\n\n");
     }
 
+    vec3 normalize_vec3(vec3 input) {
+        return glm::normalize(input);
+    }
+
     // matrix = T * R * S calculation for normal model's matrix
     void model_matrix_SRT_Normal(const float transform[][Entity::transform::max], mat4 *result) {
 

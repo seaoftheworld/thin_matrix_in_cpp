@@ -93,6 +93,33 @@ public:
     void render(Terrain *terrain, BaseShader *shader);
 };
 
+// TODO: rename tobe textured-model / textured-skybox ??? move into data.h
+//
+// SkyboxShader-class doesn't have a valid loadTransformMatrix() method now, because 
+// the skybox-shader itself only have view/proj-matrixes, no transform matrix
+#define NUM_SKYBOX_VERTICES (6 * (3 + 3))
+class Skybox {
+
+    StaticTexture *cubeTexture = NULL;
+    RawModel *cube = NULL;  // rename tobe: rawCube ???
+
+public:
+    Skybox(Loader *loader, std::string imgPaths[][6], unsigned int cube_edge_length);
+    
+    RawModel *getCubeModel() {
+        return cube;
+    }
+
+    StaticTexture *getCubeTexture() {
+        return cubeTexture;
+    }
+};
+
+class SkyboxRenderer {
+public:
+    void render(Skybox *skybox);
+};
+
 class HighLevelRenderer {
 
 public:
@@ -125,7 +152,7 @@ public:
     // Tobe called by derived class in its constructor, after
     // virtual funcs are implemented according to
     // derived class' details
-    virtual void allocEntityShader() = 0;  // only have to be called once before the rendering loop
+    virtual void allocShaders() = 0;  // only have to be called once before the rendering loop
     virtual void cleanUp() = 0;
     
     void calculateProjMatrix();            // only have to calculate once if window not resized

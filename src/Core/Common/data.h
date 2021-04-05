@@ -170,6 +170,30 @@ private:
     }
 };
 
+// Currently only used for skybox model, 
+// attribute_idx:   0
+// stride in float: 3, tobe rendered with glDrawArray(),
+// TODO: vao to replace vbo ...
+class RawModel {
+public:
+    void setData(int input_vbo_id, int input_vertex_count) {
+        vertexCount = input_vertex_count;
+        vboID = input_vbo_id;
+    }
+
+    int getVertexCount(void) {
+        return vertexCount;
+    }
+
+    int getVboID(void) {
+        return vboID;
+    }
+
+private:
+    int vboID       = -1, 
+        vertexCount = -1;
+};
+
 // class EntityInfo {
 // public:
 //     enum transform {

@@ -249,3 +249,89 @@ void Loader::loadStaticTextures(std::string *imgPaths, unsigned int num, StaticT
     
     allocStaticTextureFromBuffers(textureIds, num, output_result);
 }
+
+StaticTexture *Loader::loadStaticTextureCube(string imgPaths[][6]) {
+    if (!imgPaths) {
+        return NULL;
+    }
+
+    for (unsigned int i = 0; i < 6; i++) {
+        int x, y, comp = 0;
+        if ( !stbi_info((*imgPaths)[i].c_str(), &x, &y, &comp) ) {
+            printf("  loadCubeStaticTexture(): failed to read info for texture file: %s\n", \
+                (*imgPaths)[i].c_str());
+            return NULL;
+        }
+        if (comp != 4) {
+            printf("  loadCubeStaticTexture(): texture file: %s, comp is %d, not 4 !!!\n", \
+                (*imgPaths)[i].c_str(), comp);
+            printf("  compatible with the \'STBI_rgb_alpha\' parameter tobe used later ???\n");
+        }
+    }
+
+    unsigned int texId;
+    glGenTextures(1, &texId);
+    // if (!texId) {
+    //     glDeleteTextures(1, &texId);
+    //     return 0;
+    // }
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, texId);
+
+    stbi_set_flip_vertically_on_load(1);
+
+    for (unsigned int i = 0; i < 6; i++) {
+
+        int width, height, imgComp;
+
+        unsigned char *data = stbi_load((*imgPaths)[i].c_str(), &width, &height, &imgComp, STBI_rgb_alpha);
+        
+        if (!data) {
+            printf("loadCubeStaticTexture(): failed to read file %s!\n\n", (*imgPaths)[i].c_str());
+            continue;
+        }
+
+        if (width <= 0 || height <= 0) {
+            printf("loadCubeStaticTexture(): width or height is 0!\n\n");
+            stbi_image_free(data);
+            continue;
+        }
+
+        glTexImage2D(
+            GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, 
+            GL_RGBA, 
+            width, height, 0, 
+            GL_RGBA, 
+            GL_UNSIGNED_BYTE, data);
+
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR); // Use linear interpolation for the texture
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+        // glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        // glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+        stbi_image_free(data);
+        // printf("  gl rgb-%s texture2d ready, w-h: %d-%d\n", (alpha) ? ("alpha") : ("non_alpha"), width, height);
+        // printf("  path: %s\n\n", path.c_str());
+        printf("  gl texture2d ready, w-h: %d-%d\n", width, height);
+        printf("  path: %s\n", (*imgPaths)[i].c_str());
+    }
+    printf("\n\n");
+
+    glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+    stbi_set_flip_vertically_on_load(0);
+
+    StaticTexture *result = NULL;
+    result = new StaticTexture(texId);
+    if (!result) {
+        printf("  __ mem alloc for tex id-%d failed!\n", texId);
+        glDeleteTextures(1, &texId);
+        return NULL;
+    }
+
+    pStaticTextures.push_back(result);
+    return result;
+}

@@ -191,6 +191,30 @@ StaticModel *Loader::loadStaticModel(
     return allocStaticModelFromBuffers(&buff_ids, indices_count);
 }
 
+RawModel *Loader::loadRawModel(float *data, unsigned int stride_in_float, unsigned int vertex_count) {
+
+    if (!data) {
+        return NULL;
+    }
+
+    RawModel *p = new RawModel;
+    if (!p) {
+        return NULL;
+    }
+
+    unsigned int vboID; {
+        genVertBuffs(1, &vboID);
+        vboData(data, sizeof(float) * stride_in_float * vertex_count, vboID);
+    }
+    
+    p->setData(vboID, vertex_count);
+    pRawModels.push_back(p);
+        printf("vcount result: %d.\n", p->getVertexCount());
+        printf("vbo id result: %d.\n", p->getVboID());
+
+    return p;
+}
+
 void Loader::cleanUp() {
     for (unsigned int i = 0; i < pSingleVboModel.size(); i++) {
         // free buffers inside model
@@ -232,6 +256,21 @@ void Loader::cleanUp() {
         delete pStaticModels[i];
     }
     pStaticModels.clear();
+
+    for (unsigned int i = 0; i < pRawModels.size(); i++) {
+
+        int vboID = pRawModels[i]->getVboID();
+
+        if (vboID >= 0) {
+            // free buffers inside model
+            printf("  vbo-%d will be free-ed for a RawModel\n", vboID);
+            deleteVertBuffs(1, (unsigned int *)&vboID);
+        }
+
+        // free the model class' object
+        delete pRawModels[i];
+    }
+    pRawModels.clear();
 
     for (unsigned int i = 0; i < pStaticTextures.size(); i++) {
         

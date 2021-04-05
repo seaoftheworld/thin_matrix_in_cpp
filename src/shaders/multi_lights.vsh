@@ -8,17 +8,13 @@ uniform mat4 viewMatrix;
 uniform mat4 transformMatrix;
 
 uniform vec3 lightPosition[8];
-// uniform vec3 lightPosition0;
-// uniform vec3 lightPosition1;
 
 // To fragment shader
 varying vec2 uv;
 
 varying vec3 vertexSurface;
-varying vec3 vertexToCamera;
 varying vec3 vertexToLight[8];
-// varying vec3 vertexToLight0;
-// varying vec3 vertexToLight1;
+varying vec3 vertexToCamera;
 
 void main()
 {
@@ -32,6 +28,7 @@ void main()
     vertexToCamera = (inverse(viewMatrix) * vec4(0.0, 0.0, 0.0, 1.0)).xyz - vertexWorldPosition.xyz;
     
     for (int i = 0; i < 8; i++) {
+    // for (int i = 0; i < 1; i++) {
         vertexToLight[i] = lightPosition[i] - vertexWorldPosition.xyz;
     }
     // vertexToLight0 = lightPosition0 - vertexWorldPosition.xyz;

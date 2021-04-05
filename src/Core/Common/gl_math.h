@@ -10,7 +10,9 @@ namespace gl_math {
     typedef glm::vec4 vec4;
     typedef glm::vec3 vec3;
 
-    void print_mat4(const char* prefix, mat4 m);
+    void print_mat4(const char *prefix, mat4 m);
+
+    vec3 normalize_vec3(vec3 input);
 
     void model_matrix_SRT_Normal(const float transform[][Entity::transform::max], mat4 *result);
     void model_matrix_STR_Rot(const float transform[][Entity::transform::max], mat4 *result);

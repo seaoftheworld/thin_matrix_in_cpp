@@ -6,14 +6,14 @@ public:
     MultiLightsRenderer() {
         printf("  __ multi-lights-renderer constructor called.\n");
         cleanUp();
-        allocEntityShader();
+        allocShaders();
     }
     ~MultiLightsRenderer() {
         printf("  __ multi-lights-renderer destructor called.\n");
         cleanUp();
     }
 
-    void allocEntityShader() override;  // only have to be called once before the rendering loop
+    void allocShaders() override;  // only have to be called once before the rendering loop
     void cleanUp() override;
 
     bool getEntityShaderStatus();

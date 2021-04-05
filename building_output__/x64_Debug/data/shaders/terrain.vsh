@@ -30,7 +30,8 @@ void main()
     vec4 vertexWorldPosition = transformMatrix * vec4(vertexPosition, 1.0);
     gl_Position = projMatrix * viewMatrix * vertexWorldPosition;
 
-    uv = vertexUV * 4.0;
+    // uv = vertexUV * 4.0;
+    uv = vertexUV;
 
     vertexSurface = (transformMatrix * vec4(vertexNormal, 0.0)).xyz;
     vertexToLight = lightPosition - vertexWorldPosition.xyz;

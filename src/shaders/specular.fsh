@@ -1,16 +1,17 @@
-// out vec4 color;
+uniform sampler2D texSampler;
+
+// Inputs
+uniform vec3 lightColor;
+
+uniform float reflectivity;
+uniform float shineDamper;
+
+// From vsh
 varying vec2 uv;
 
 varying vec3 vertexSurface;
 varying vec3 vertexToLight;
 varying vec3 vertexToCamera;
-
-uniform sampler2D texSampler;
-
-uniform vec3 lightColor;
-
-uniform float reflectivity;
-uniform float shineDamper;
 
 // uniform float blendAlpha = 1.0f;
 // uniform float blendAlpha;

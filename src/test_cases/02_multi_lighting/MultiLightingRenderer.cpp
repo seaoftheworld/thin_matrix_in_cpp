@@ -22,7 +22,7 @@ void MultiLightsRenderer::specificSettingsOn() {
 void MultiLightsRenderer::specificSettingsOff() {
 }
 
-void MultiLightsRenderer::allocEntityShader() {
+void MultiLightsRenderer::allocShaders() {
 
     MultiLightsShader *shader = new MultiLightsShader;
 

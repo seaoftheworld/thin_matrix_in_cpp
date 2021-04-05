@@ -10,6 +10,60 @@
 #define     KEY_MOVE_SPEED (0.05f)
 #define             FACTOR (1.0f)
 
+static const float skybox_init_data_array[NUM_SKYBOX_VERTICES * 3] = {
+
+    // Bottom
+    -1,  1, -1,
+    -1, -1, -1,
+     1,  1, -1,
+     1,  1, -1,
+     1, -1, -1,
+    -1, -1, -1,
+
+    // Left
+    -1,  1, -1,
+    -1, -1, -1,
+    -1, -1,  1,
+
+    -1, -1,  1,
+    -1,  1,  1,
+    -1,  1, -1,
+
+    // Right
+     1, -1, -1,
+     1,  1, -1,
+     1,  1,  1,
+     
+     1,  1,  1,
+     1, -1,  1,
+     1, -1, -1,
+
+    // Front
+    -1,  1, -1,  // 1 +--+ 2
+    -1,  1,  1,  //   | /
+     1,  1,  1,  // 0 |/
+
+     1,  1,  1,  //      + 3
+     1,  1, -1,  //     /|
+    -1,  1, -1,  // 5  /_| 4
+
+    // Top
+    -1, -1,  1,
+     1, -1,  1,
+     1,  1,  1,
+     1,  1,  1,
+    -1,  1,  1,
+    -1, -1,  1,
+
+    // Back
+    -1, -1, -1,
+    -1, -1,  1,
+     1, -1, -1,
+     1, -1, -1,
+    -1, -1,  1,
+     1, -1,  1,
+};
+
 void HighLevelRenderer::calculateProjMatrix() {
     projection_matrix = gl_math::perspective(gl_math::radians(FOV), (float)WIN_WIDTH / WIN_HEIGHT, NEAR_PLANE, FAR_PLANE);
 }
@@ -62,7 +116,7 @@ void EntityRenderer::render(Entity *entity, BaseShader *shader) {
                             StaticModel_SingleVbo::valid_attr_stride[i], GL_FLOAT,
                             GL_FALSE,
                             StaticModel_SingleVbo::single_vbo_stride_in_float << 2,// N-floats * 4 ==> stride in bytes (N = 3, 2, ...)
-                            (void *)StaticModel_SingleVbo::valid_attr_offset[i]);  // offset is measured in Bytes
+                            (const void *)StaticModel_SingleVbo::valid_attr_offset[i]);  // offset is measured in Bytes
                     }
                 }
 
@@ -147,7 +201,6 @@ void EntityRenderer::render(Entity *entity, BaseShader *shader) {
 }
 
 void TerrainRenderer::render(Terrain *terrain, BaseShader *shader) {
-    // shader->start();
     if (!terrain || !shader) {
         return;
     }
@@ -156,14 +209,26 @@ void TerrainRenderer::render(Terrain *terrain, BaseShader *shader) {
     // when NULL-texture/model pointers are input by mistake.
     unsigned int indices_count = 0;
 
-    StaticTexture *static_texture = terrain->getTexture();
+    TerrainTexturePack *texturePack = terrain->getTexturePack();
+    TerrainTexture *blendMap = terrain->getBlendMap();
     BaseModel *static_model = terrain->getModel();
 
-    if (static_texture) {
+    if (texturePack && blendMap) {
         // bind a texture buffer object
-        int texture_id = static_texture->getId();
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, texture_id);
+        glBindTexture(GL_TEXTURE_2D, texturePack->getTerrainTexture00()->getTextureID());
+        
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, texturePack->getTerrainTexture01()->getTextureID());
+
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D, texturePack->getTerrainTexture02()->getTextureID());
+        
+        glActiveTexture(GL_TEXTURE3);
+        glBindTexture(GL_TEXTURE_2D, texturePack->getTerrainTexture03()->getTextureID());
+
+        glActiveTexture(GL_TEXTURE4);
+        glBindTexture(GL_TEXTURE_2D, blendMap->getTextureID());
     }
 
     if (static_model) {
@@ -293,5 +358,68 @@ void Camera::input_update(WindowSystem &win) {
             printf("cam direction: %f, %f, %f\n", direc.x, direc.y, direc.z);
             printf("cam        up: %f, %f, %f\n\n\n", up.x, up.y, up.z);
         }
+    }
+}
+
+Skybox::Skybox(Loader *loader, std::string imgPaths[][6], unsigned int cube_edge_length) {
+    if (!loader || !imgPaths) {
+        return;
+    }
+
+    float vertices_data[NUM_SKYBOX_VERTICES * 3];
+
+    for (unsigned int i = 0; i < NUM_SKYBOX_VERTICES * 3; i++) {
+        vertices_data[i] = cube_edge_length * skybox_init_data_array[i];
+    }
+
+    cube = loader->loadRawModel(vertices_data, 3, NUM_SKYBOX_VERTICES);
+    printf("cube: %p\n", cube);
+    if (cube) {
+        printf("cube vbo: %d\n", cube->getVboID());
+        printf("cube vcount: %d\n", cube->getVertexCount());
+    }
+
+    cubeTexture = loader->loadStaticTextureCube(imgPaths);
+    printf("cubeTexture: %p\n", cubeTexture);
+}
+
+void SkyboxRenderer::render(Skybox *skybox) {
+    // shader->start();
+    // if (!terrain || !shader) {
+    //     return;
+    // }
+
+    // Setting this to be 0 could make drawing unable to crash the program,
+    // when NULL-texture/model pointers are input by mistake.
+    unsigned int vertices_count = 0;
+    if (!skybox) {
+        return;
+    }
+
+    if (skybox->getCubeTexture()) {
+        // bind a texture buffer object
+        int texture_id = skybox->getCubeTexture()->getId();
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, texture_id);
+    }
+
+    if (skybox->getCubeModel()) {
+        vertices_count = skybox->getCubeModel()->getVertexCount();
+
+        glBindBuffer(GL_ARRAY_BUFFER, skybox->getCubeModel()->getVboID());
+        
+        glEnableVertexAttribArray(0);
+        
+        glVertexAttribPointer(
+            0, 
+            3, GL_FLOAT, 
+            GL_FALSE, 
+            3 << 2,  // N-floats * 4 ==> stride in bytes (N = 3, 2, ...)
+            0);
+    }
+
+    {
+        glDrawArrays(GL_TRIANGLES, 0, vertices_count);
+        // glDrawArrays(GL_TRIANGLES, 0, 3 * 3);
     }
 }

@@ -66,4 +66,14 @@ void TerrainShader::getAllUniformLocations() {
     objShineDamper_loc = getUniformLocation("shineDamper");
     objReflect_loc = getUniformLocation("reflectivity");
     printf("    unif_loc for reflec/shineDamper: %d, %d\n\n", objReflect_loc, objShineDamper_loc);
+
+    // Get uniform locations for 5 samplers
+    texture00_sampler_loc = getUniformLocation("texture00");
+    texture01_sampler_loc = getUniformLocation("texture01");
+    texture02_sampler_loc = getUniformLocation("texture02");
+    texture03_sampler_loc = getUniformLocation("texture03");
+    blendMap_sampler_loc = getUniformLocation("blendMap");
+    printf("    unif_loc for 5 textures: %d, %d, %d, %d, %d\n\n", 
+        texture00_sampler_loc, texture01_sampler_loc, texture02_sampler_loc, 
+        texture03_sampler_loc, blendMap_sampler_loc);
 }

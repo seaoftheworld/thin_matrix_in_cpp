@@ -15,7 +15,11 @@ using namespace std;
 class Loader {
 public:
     Loader() {
+        pSingleVboModel.clear();
         pStaticModels.clear();
+        pRawModels.clear();
+
+        pStaticTextures.clear();
     }
 
     // delete allocated vao/vbos in the model,
@@ -24,20 +28,25 @@ public:
 
     void loadStaticTextures(string *imgPaths, unsigned int num, StaticTexture **output_result);
 
+    StaticTexture *loadStaticTextureCube(string imgPaths[][6]);
+
     StaticModel_SingleVbo *loadSingleVboModel(
         float *input_attr_data, unsigned int vertex_count, unsigned short *input_indices_data, unsigned int indices_count
     );
-
-    // const StaticModel *loadStaticModel(float *pos, float *uv, float *normal, unsigned int *idx);
+    // StaticModel is multi-vbo model
     StaticModel *loadStaticModel(
         float *input_attr_data[][StaticModel::vboNum], unsigned int vertex_count, 
         unsigned short *input_indices_data, unsigned int indices_count);
 
-private:
-    vector<StaticTexture*> pStaticTextures;
+    RawModel *loadRawModel(float *data, unsigned int count, unsigned int stride_in_byte);
 
+private:
     vector<StaticModel_SingleVbo *> pSingleVboModel;
-    vector<StaticModel*> pStaticModels;
+    vector<StaticModel *> pStaticModels;
+
+    vector<RawModel *> pRawModels;
+
+    vector<StaticTexture *> pStaticTextures;
 
     unsigned int createStaticTextureBuffers(std::string *imgPaths, unsigned int num, unsigned int output_buff_texture_ids[][MAX_TEXTURE_NUM_ONCE]);
     void allocStaticTextureFromBuffers(unsigned int *input_textureIds, unsigned int num, StaticTexture **output_result);
