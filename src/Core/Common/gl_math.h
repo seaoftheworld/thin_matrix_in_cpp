@@ -1,3 +1,5 @@
+#pragma once
+
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -14,6 +16,8 @@ namespace gl_math {
 
     vec3 normalize_vec3(vec3 input);
 
+    void create_transform_matrix(const float pos[][2], const float scale[][2], mat4 *result);
+    
     void model_matrix_SRT_Normal(const float transform[][Entity::transform::max], mat4 *result);
     void model_matrix_STR_Rot(const float transform[][Entity::transform::max], mat4 *result);
     void get_xyz_from_rotz(float input_pos[][3], float rot_z, float output_result[][3]);

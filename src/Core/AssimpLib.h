@@ -1,3 +1,5 @@
+// #pragma once // includeded in 1. terrrain_03 main.cpp, 2. DataInit.h
+
 // #include "Common/data.h"
 #include "Loader.h"
 

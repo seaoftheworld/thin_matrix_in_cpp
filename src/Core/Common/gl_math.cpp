@@ -66,6 +66,27 @@ namespace gl_math {
         *result = rotate_xyz * translate * scale;
     }
 
+    void create_transform_matrix(const float input_pos[][2], const float input_scale[][2], mat4 *result) {
+
+        // #define TRANS_INFO(x) ( (*transform)[Entity::transform::x] )
+
+        mat4 translate = glm::translate(
+            mat4(1.0f),
+            vec3((*input_pos)[0], (*input_pos)[1], 0.0f));
+
+            // mat4   rotate_x = glm::rotate(mat4(1.0f), TRANS_INFO(rot_x), vec3(1.0f, 0.0f, 0.0f));
+            // mat4   rotate_xy = glm::rotate(rotate_x, TRANS_INFO(rot_y), vec3(0.0f, 1.0f, 0.0f));
+            // mat4   rotate_xyz = glm::rotate(rotate_xy, TRANS_INFO(rot_z), vec3(0.0f, 0.0f, 1.0f));
+            // // mat4   rotate_z = glm::rotate(mat4(1.0f), TRANS_INFO(rot_z), vec3(0.0f, 0.0f, 1.0f));
+        
+        mat4 scale = glm::scale(
+            mat4(1.0f), 
+            vec3((*input_scale)[0], (*input_scale)[1], 1.0f) );
+        
+        // *result = translate * rotate_xyz * scale;
+        *result = translate * scale;
+    }
+
     // Supposed tobe used to get the positions of 4 lights according to 4 transforms of crates.
     // Crates are rendered with STR model-matrix, not normal SRT matrix,
     // so even though a crate is rendered and spins around axis-z,

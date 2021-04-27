@@ -1,8 +1,8 @@
 #include <stdio.h>
 
-int test_00_basics();
-int test_01_specular_lighting();
-int test_02_multi_lighting();
+int test_00_basic_entity_renderer();
+int test_01_specular_entity_renderer();
+int test_02_multi_lights_entity_renderer();
 int test_03_terrain();
 
 int main() {
@@ -26,16 +26,16 @@ int main() {
         switch (input_value) {
             case 0:
             // printf("    test-%d not supported yet.\n\n", input_value);
-                result = test_00_basics();
+                result = test_00_basic_entity_renderer();
             break;
 
             case 1:
-                result = test_01_specular_lighting();
+                result = test_01_specular_entity_renderer();
                 // run = false;
             break;
 
             case 2:
-                result = test_02_multi_lighting();
+                result = test_02_multi_lights_entity_renderer();
                 // run = false;
             break;
 

@@ -129,7 +129,7 @@ void Loader::createStaticModelBuffers(
     int output_buffer_vbos_ibo_ids[][StaticModel::allBuffNum]) {
 
     createVbos(input_attr_data, vertex_count, output_buffer_vbos_ibo_ids);
-    createIbo(input_indices_data, indices_count, *output_buffer_vbos_ibo_ids + StaticModel::vboNum);
+    createIbo(input_indices_data, indices_count, (*output_buffer_vbos_ibo_ids) + StaticModel::vboNum);
 }
 
 // 'vbos' as input for the StaticModel to be allocated now

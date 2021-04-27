@@ -1,5 +1,9 @@
 #pragma once
 #include "../../Common/gl_header.h"
+
+#include <vector>  // terrain-shader.h and multi-lights-shader.h will 
+#include <string>  // need to include this for multi-lights
+
 #include <stdio.h>
 
 class BaseShader {
@@ -23,7 +27,6 @@ public:
             status = comp_vsh_passed;
         }
 
-        // printf("22222222\n");
         if (!initShader(fshPath, &fsh, GL_FRAGMENT_SHADER)) {
             status = comp_vsh_passed_fsh_failed;  // shall delete shader related mem ...
             return;

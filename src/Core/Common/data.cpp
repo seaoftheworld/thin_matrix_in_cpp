@@ -1,19 +1,23 @@
 #include "data.h"
 
-#include "../Shader/StaticShader.h"
+#include "Core/Renderers/Model/StaticShader.h"
 
 // Vbos info for Arrays-of-struct multi-vbo type's model
 // -----------------------------------------------------
 const unsigned int StaticModel::vbo_atrr_idx[vboNum] = {
     // each vbo's corresponding attr index-num in shader
     StaticShader::attr_idx[StaticShader::id0_pos3f],
-    StaticShader::attr_idx[StaticShader::id1_uv2f]
+    StaticShader::attr_idx[StaticShader::id1_uv2f],
+    StaticShader::attr_idx[StaticShader::id2_normal3f]
+    // 0
 };
 
 const unsigned int StaticModel::vbo_stride[vboNum] = {
     // each vbo's corresponding attr stride (by float) in shader
     StaticShader::attr_stride[StaticShader::id0_pos3f],
-    StaticShader::attr_stride[StaticShader::id1_uv2f]
+    StaticShader::attr_stride[StaticShader::id1_uv2f],
+    StaticShader::attr_stride[StaticShader::id2_normal3f]
+    // 0
 };
 
 // Valid-attributes' info in a single-vbo (Struct-of-arrays type's model)

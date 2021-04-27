@@ -30,40 +30,35 @@ int BaseShader::initShader(const char *path, GLuint *id, GLenum type) {
         return 0;
     }
 
+    // Compile the Shader and check the result
+    const GLchar *sh_source = source.c_str();
+    glShaderSource(shaderId, 1, &sh_source, NULL);
+
+    glCompileShader(shaderId); 
+
+    GLint Result; {
+        glGetShaderiv(shaderId, GL_COMPILE_STATUS, &Result);
+
+        if (!Result) {
+
+            std::string log;
+            GLint logSize;
+
+            glGetShaderiv(shaderId, GL_INFO_LOG_LENGTH, &logSize);
+            log.resize(logSize);
+            log.reserve(logSize);
+            glGetShaderInfoLog(shaderId, logSize, NULL, (char *)log.data());
+
+            printf("shader Error:\n%s\n", log.c_str());
+
+            glDeleteShader(shaderId);
+            return 0;
+        }
+    }
+
     if (id) {
         *id = shaderId;
     }
-
-    // Compile the Shader and check the result
-    const GLchar* sh_source = source.c_str();
-    glShaderSource(shaderId, 1, &sh_source, NULL);
-
-    GLint Result;
-    glCompileShader(shaderId); 
-    glGetShaderiv(shaderId, GL_COMPILE_STATUS, &Result);
-    if (!Result) {
-        std::string log;
-        GLint       logSize;
-
-        glGetShaderiv(shaderId, GL_INFO_LOG_LENGTH, &logSize);
-        log.resize(logSize);
-        log.reserve(logSize);
-        glGetShaderInfoLog(shaderId, logSize, NULL, (char*)log.data());
-
-        printf("shader Error:\n%s\n", log.c_str());
-
-        if (id) {
-            // deinitShader(id);
-            glDeleteShader(*id);
-        }
-        else {
-            // deinitShader(&shaderId);
-            glDeleteShader(shaderId);
-        }
-
-        return 0;
-    }
-
     return 1;
 }
 
@@ -83,22 +78,25 @@ int BaseShader::initProg(GLuint vsh, GLuint fsh, GLuint *prog) {
     glAttachShader(*prog, fsh);
     glLinkProgram(*prog);
 
-    GLint linkStatus;
-    glGetProgramiv(*prog, GL_LINK_STATUS, &linkStatus);
-    if (linkStatus == GL_FALSE) {
-        std::string log;
-        GLint       logSize;
+    GLint linkStatus; {
 
-        glGetProgramiv(*prog, GL_INFO_LOG_LENGTH, &logSize);
-        log.resize(logSize);
-        log.reserve(logSize);
-        glGetProgramInfoLog(*prog, logSize, NULL, (char *)log.data());
+        glGetProgramiv(*prog, GL_LINK_STATUS, &linkStatus);
 
-        glDeleteProgram(*prog);
-        
-        printf("glLinkProgram() Failed: \n%s\n", log.c_str());
-        // status = link_prog_failed;  // status assigned value according to returned value
-        return 0;
+        if (linkStatus == GL_FALSE) {
+            std::string log;
+            GLint logSize;
+
+            glGetProgramiv(*prog, GL_INFO_LOG_LENGTH, &logSize);
+            log.resize(logSize);
+            log.reserve(logSize);
+
+            glGetProgramInfoLog(*prog, logSize, NULL, (char *)log.data());
+            printf("glLinkProgram() Failed: \n%s\n", log.c_str());
+            
+            // status = link_prog_failed;  // status assigned value according to returned value
+            glDeleteProgram(*prog);
+            return 0;
+        }
     }
 
     printf("  gl prog generated, id: \'%d'\n", *prog);

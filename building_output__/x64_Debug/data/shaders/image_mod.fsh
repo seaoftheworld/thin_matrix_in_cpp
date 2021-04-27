@@ -1,9 +1,9 @@
 varying vec2 uv;
-// out vec4 color;
+varying vec3 normal;
 
 uniform sampler2D texSampler;
 // uniform float blendAlpha = 1.0f;
-uniform float blendAlpha;
+// uniform float blendAlpha;
 
 void main()
 {
@@ -20,6 +20,7 @@ void main()
     if (color.a < 0.1) {
         discard;
     }
-    
+
+    vec3 dummy_value = normal;
     gl_FragColor = color;
 }

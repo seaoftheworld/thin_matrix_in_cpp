@@ -1,16 +1,10 @@
+#pragma once
+
 #define __USE_INLINE_METHODS__
 #include "../WindowSystem/WindowSystem.h"  // To use WIN_WIDTH, WIN_HEIGHT, 'WindowSystem' class, and its input functions...
 
-#include "Core/Shader/Base/BaseShader.h"
-// #include "Shader/StaticShader.h"  // basic shader
-// #include "Shader/SpecularShader.h"
-// #include "Shader/MultiLightsShader.h"
-
 #include "Common/gl_header.h"
 #include "Common/gl_math.h"
-
-#include "Common/data.h"
-#include "Terrain.h"
 
 #include <iostream>
 
@@ -82,82 +76,33 @@ private:
     float hAngle, vAngle;
 };
 
-class EntityRenderer {
-public:
-    // void process(Entity *entity, BaseShader *shader, unsigned int str_rot);
-    void render(Entity *entity, BaseShader *shader);
-};
+// Base class for entity-renderer, terrain-renderer, skybox-renderer, gui-renderer
+class BaseRenderer {
 
-class TerrainRenderer {
-public:
-    void render(Terrain *terrain, BaseShader *shader);
-};
-
-// TODO: rename tobe textured-model / textured-skybox ??? move into data.h
-//
-// SkyboxShader-class doesn't have a valid loadTransformMatrix() method now, because 
-// the skybox-shader itself only have view/proj-matrixes, no transform matrix
-#define NUM_SKYBOX_VERTICES (6 * (3 + 3))
-class Skybox {
-
-    StaticTexture *cubeTexture = NULL;
-    RawModel *cube = NULL;  // rename tobe: rawCube ???
+private:
+    static gl_math::mat4 projection_matrix;
+    static gl_math::mat4 view_matrix;
 
 public:
-    Skybox(Loader *loader, std::string imgPaths[][6], unsigned int cube_edge_length);
-    
-    RawModel *getCubeModel() {
-        return cube;
-    }
-
-    StaticTexture *getCubeTexture() {
-        return cubeTexture;
-    }
-};
-
-class SkyboxRenderer {
-public:
-    void render(Skybox *skybox);
-};
-
-class HighLevelRenderer {
-
-public:
-    // Supposed to be called before an object is instanced
-    static int init() {
+    // Supposed to be called before any object is instanced
+    static bool init() {
         if (gl3wInit()) {
-            return 0;
+            return false;
         }
-        return 1;
-    }
-
-    HighLevelRenderer() {        
-        printf("  __ hl-renderer constructor called.\n");
 
         std::cout << "  HighLevelRenderer() info: " << std::endl;
         std::cout << "    Vendor:  " << glGetString(GL_VENDOR) << std::endl;
         std::cout << "    Render:  " << glGetString(GL_RENDERER) << std::endl;
         std::cout << "    Version: " << glGetString(GL_VERSION) << std::endl;
         
-        calculateProjMatrix();  // only have to calculate once if window not resized
-        clearEntities();
+        // clearEntities();
+        calculateProjMatrix();  // only have to calculate once if window never resized
+        return true;
     }
 
-    virtual ~HighLevelRenderer() {
-        printf("  __ hl-renderer destructor called.\n");
-        clearEntities();
-    }
-
-public:
-    // Tobe called by derived class in its constructor, after
-    // virtual funcs are implemented according to
-    // derived class' details
-    virtual void allocShaders() = 0;  // only have to be called once before the rendering loop
-    virtual void cleanUp() = 0;
-    
-    void calculateProjMatrix();            // only have to calculate once if window not resized
-
-    void calculateViewMatrix(const gl_math::vec3 &cam_pos, const gl_math::vec3 &cam_direc, const gl_math::vec3 &cam_up) {
+    // only have to calculate once if window never resized
+    static void calculateProjMatrix();
+    static void calculateViewMatrix(const gl_math::vec3 &cam_pos, const gl_math::vec3 &cam_direc, const gl_math::vec3 &cam_up) {
         view_matrix = gl_math::lookAt(
             cam_pos,             // Camera is here
             cam_pos + cam_direc, // and looks here : at the same position, plus "camDirection"
@@ -165,43 +110,32 @@ public:
         );
     }
 
-    // this is supposed to be called before rendering loop is entered,
+public:
+    // this is supposed to be called before rendering loop is entered to set proj_mat for the shader,
     // shader shall be started / bound-to before calling this
     float *getProjMatrix() {
         return &projection_matrix[0][0];
     }
 
-    // this is supposed to be called in the rendering loop,
+    // this is supposed to be called in the rendering loop to set the view_mat for the shader,
     // after shader is bound to / started
     float *getViewMatrix() {
         return &view_matrix[0][0];
     }
 
+    // Tobe called by derived class in its constructor, after
+    // virtual funcs are implemented according to
+    // derived class' details
+    virtual void allocShadersData() = 0;  // only have to be called once before the rendering loop
+    virtual void freeShadersData() = 0;
+    virtual bool ready() = 0;             // to check does are shaders successfully allocated 
+
 public:
-    void addEntity(Entity *input_entity) {
-        if (input_entity) {
-            entities.push_back(input_entity);
-        }
+    BaseRenderer() {
+        printf("  __ base-renderer constructor called.\n");
     }
 
-    unsigned int getEntitiesSize() {
-        return entities.size();
+    virtual ~BaseRenderer() {
+        printf("  __ base-renderer destructor called.\n");
     }
-
-    void clearEntities() {
-        entities.clear();
-    }
-
-    std::vector<Entity *> &getEntities() {
-        return entities;
-    }
-
-private:
-    gl_math::mat4 projection_matrix = gl_math::mat4(1.0f);
-    gl_math::mat4 view_matrix = gl_math::mat4(1.0f);
-
-    std::vector<Entity *> entities;
-
-    // pointer to specific shaders from derived class
-    // object of specific renders from derived class
 };

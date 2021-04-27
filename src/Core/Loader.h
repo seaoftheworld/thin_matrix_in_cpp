@@ -38,7 +38,7 @@ public:
         float *input_attr_data[][StaticModel::vboNum], unsigned int vertex_count, 
         unsigned short *input_indices_data, unsigned int indices_count);
 
-    RawModel *loadRawModel(float *data, unsigned int count, unsigned int stride_in_byte);
+    RawModel *loadRawModel(float *data, unsigned int stride_in_float, unsigned int vertex_count);
 
 private:
     vector<StaticModel_SingleVbo *> pSingleVboModel;

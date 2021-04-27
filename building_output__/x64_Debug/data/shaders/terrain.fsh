@@ -17,7 +17,6 @@ uniform vec3 lightColor;
 uniform float reflectivity;
 uniform float shineDamper;
 
-
 // uniform float blendAlpha = 1.0f;
 // uniform float blendAlpha;
 
@@ -42,21 +41,19 @@ void main()
     // gl_FragColor = texture2D(texSampler, uv);
     // gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
 
-    vec3 unitVertexSurface = normalize(vertexSurface);
-    vec3 unitVertexToLight = normalize(vertexToLight);
+        vec3 unitVertexSurface = normalize(vertexSurface);
+        vec3 unitVertexToLight = normalize(vertexToLight);
 
-    float dot_result = dot(unitVertexSurface, unitVertexToLight);
-        float brightness = max(dot_result, 0.2);
-        vec3 diffuse = brightness * lightColor;
+        float brightness = dot(unitVertexSurface, unitVertexToLight);
+            brightness = max(brightness, 0.2);
+            vec3 diffuse = brightness * lightColor;
+        vec4 color = vec4(diffuse, 1.0) * blend_color;
+        // vec4 color = blend_color;
 
-    // vec4 color = vec4(diffuse, 1.0) * texture2D(texSampler, uv);
-    vec4 color = vec4(diffuse, 1.0) * blend_color;
     // if (color.a < 0.1) {
     //     discard;
     // }
     // gl_FragColor = color;
-
-
 
         vec3 vertexReflectedLight = reflect(-unitVertexToLight, unitVertexSurface);
         vec3 unitVertexToCamera = normalize(vertexToCamera);
@@ -74,4 +71,6 @@ void main()
         // }
         color = color + vec4(specular, 1.0);
         gl_FragColor = color;
+
+        // gl_FragColor = color;
 }
