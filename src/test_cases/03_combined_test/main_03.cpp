@@ -70,7 +70,7 @@ int test_03_terrain() {
 
         renderers.terrainRenderer.addTerrain(targets.getTerrain());
         renderers.skyboxRenderer.setSkybox(targets.getSkybox());
-        // renderers.guiRenderer.addGui(targets.getGui());
+        renderers.guiRenderer.addGui(targets.getGui());
     }
 
     // Light light; {

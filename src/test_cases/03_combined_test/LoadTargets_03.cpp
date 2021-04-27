@@ -347,8 +347,8 @@ void LoadTargets_03::initGui() {
         }
 
         if (guiTexture) {
-            float gui_pos[] = {-0.5f, 0.5f};
-            float gui_scale[] = { 0.5f, 0.5f };
+            float gui_pos[] = {-0.75f, 0.75f};
+            float gui_scale[] = { 0.25f, 0.25f };
 
             gui.init(guiTexture->getId(), &gui_pos, &gui_scale);
             
