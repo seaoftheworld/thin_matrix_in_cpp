@@ -7,6 +7,7 @@
 #include "Core/Renderers/Terrain/TerrainRenderer.h"
 #include "Core/Renderers/Skybox/SkyboxRenderer.h"
 #include "Core/Renderers/Gui/GuiRenderer.h"
+#include "Core/Renderers/Water/WaterRenderer.h"
 
 #define PROFILING (0)
 #include "Core/profile.h"
@@ -35,16 +36,19 @@ public:
     TerrainRenderer terrainRenderer;
     SkyboxRenderer   skyboxRenderer;
     GuiRenderer         guiRenderer;
-    // WaterRenderer water;
+    WaterRenderer     waterRenderer;
 
     void specificSettingsOff();
     void specificSettingsOn();
 
-    void process(Light &light) {
+    void processScene(Light &light, float clipPlane[][4]) {
         prepare();
             // entityRenderer.run();
             // entityRenderer.run(*lights[0]);
-            entityRenderer.run(lights);
+
+            // glEnable(GL_CLIP_DISTANCE0);
+            entityRenderer.run(lights, clipPlane);
+            // glDisable(GL_CLIP_DISTANCE0);
 
             // Light test_light; {
             //     // float position[Light::Position::max_pos] = {0.0f, 1.0f, 2.0f};
@@ -57,10 +61,16 @@ public:
             // }
             // terrainRenderer.run(test_light);
 
-            terrainRenderer.run(lights);
-
+            terrainRenderer.run(lights, clipPlane);
             skyboxRenderer.run();
-            guiRenderer.run();
+    }
+
+    void processWater(WaterFrameBuffers *fbos, unsigned int dudv, unsigned int normal) {
+        waterRenderer.run(fbos, dudv, normal);
+    }
+
+    void processGui() {
+        guiRenderer.run();
     }
 
 private:

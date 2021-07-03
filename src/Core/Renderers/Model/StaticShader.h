@@ -1,8 +1,8 @@
 #pragma once
 #include "Core/Shader/Base/BaseShader.h"
 
-#define VSH_PATH "data/shaders/image_mod.vsh"
-#define FSH_PATH "data/shaders/image_mod.fsh"
+#define VSH_PATH "data/shaders/models/image_mod.vsh"
+#define FSH_PATH "data/shaders/models/image_mod.fsh"
 
 class StaticShader : public BaseShader {
 

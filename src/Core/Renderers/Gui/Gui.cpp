@@ -1,3 +1,3 @@
 #include "Gui.h"
 
-RawModel *GuiType00::rect = NULL;
+SingleAttributeModel *GuiType00::rect = NULL;

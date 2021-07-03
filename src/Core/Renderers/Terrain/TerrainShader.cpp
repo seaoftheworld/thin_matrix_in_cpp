@@ -100,7 +100,10 @@ void TerrainShader::getAllUniformLocations() {
     texture02_sampler_loc = getUniformLocation("texture02");
     texture03_sampler_loc = getUniformLocation("texture03");
     blendMap_sampler_loc = getUniformLocation("blendMap");
-    printf("    unif_loc for 5 textures: %d, %d, %d, %d, %d\n\n", 
+    printf("    terrain unif_loc for 5 textures: %d, %d, %d, %d, %d\n\n", 
         texture00_sampler_loc, texture01_sampler_loc, texture02_sampler_loc, 
         texture03_sampler_loc, blendMap_sampler_loc);
+
+    clipPlane_loc = getUniformLocation("terrainClipPlane");
+    printf("    terrain clipPlane_loc : %d\n\n\n\n", clipPlane_loc);
 }

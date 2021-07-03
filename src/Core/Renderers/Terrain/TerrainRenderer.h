@@ -27,7 +27,7 @@ public:
         freeShadersData();
     }
 
-    void run(std::vector<Light *> lights) {
+    void run(std::vector<Light *> lights, float clipPlane[][4]) {
 
         if (!terrainShader) {
             return;
@@ -35,10 +35,14 @@ public:
 
         terrainShader->start();
         terrainShader->loadViewMatrix(getViewMatrix());
-
-        terrainShader->loadReflectivity(200.0f);
-        terrainShader->loadShineDamper(200.0f);
         terrainShader->loadLights(lights);
+
+        terrainShader->loadShineDamper(200.0f);
+        terrainShader->loadReflectivity(0.1f);
+
+        if (clipPlane) {
+            terrainShader->loadClipPlane(clipPlane);
+        }
 
         render();
     }

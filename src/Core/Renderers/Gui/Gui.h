@@ -3,8 +3,8 @@
 // typedef float(*pA2f)[2];
 // typedef pA2f fpA2f();
 
-#define GUI_RECT_VERTICES_NUM    (4)
 #define GUI_RECT_VERTICES_STRIDE (2)
+#define GUI_RECT_VERTICES_NUM    (4)
 
 class GuiType00 {
 private:
@@ -14,7 +14,7 @@ private:
 
 public:
     // The model for a gui (and all guis)
-    static RawModel *rect;
+    static SingleAttributeModel *rect;
 
 public:
     void init(unsigned int input_tex_id, float input_pos[][2], float input_scale[][2]) {

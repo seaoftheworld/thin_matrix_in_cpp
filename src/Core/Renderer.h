@@ -10,17 +10,10 @@
 
 class Camera {
 
+    gl_math::vec3 position, direc, right, up;
+    float hAngle, vAngle;
+
 public:
-    Camera(gl_math::vec3 pos, float input_h = 0, float input_v = 0) {
-        
-        hAngle = input_h; vAngle = input_v;
-        position = pos;
-
-        calculateDirecRightUp();
-    }
-
-    // float getHAngle();
-    // float getVAngle();
     gl_math::vec3 getPosition() {
         return position;
     }
@@ -29,33 +22,29 @@ public:
         return direc;
     }
 
-    gl_math::vec3 getRight() {
-        return right;
-    }
-
     gl_math::vec3 getUp() {
         return up;
     }
 
-    void setPositionAngle(float input_data[][5]) {
-        if (input_data) {
-            position.x = (*input_data)[0];
-            position.y = (*input_data)[1];
-            position.z = (*input_data)[2];
-
-            hAngle = (*input_data)[3];
-            vAngle = (*input_data)[4];
-
-            calculateDirecRightUp();
-        }
+    void setHeight(float height) {
+        position.z = height;
     }
 
-    void setAngles() {
+    float getHeight() {
+        return position.z;
     }
 
-    void input_update(WindowSystem &win);
+    void inverseVerticalAngle() {
+        vAngle = -vAngle;
+    }
 
-private:
+    // float getHAngle();
+    // float getVAngle();
+
+    // gl_math::vec3 getRight() {
+    //     return right;
+    // }
+
     void calculateDirecRightUp() {
         direc = gl_math::vec3(
             cos(vAngle) * sin(hAngle),
@@ -71,9 +60,34 @@ private:
 
         up = gl_math::cross(right, direc);
     }
-    
-    gl_math::vec3 position, direc, right, up;
-    float hAngle, vAngle;
+
+public:
+    void setPositionAngle(float input_data[][5]) {
+        if (input_data) {
+            position.x = (*input_data)[0];
+            position.y = (*input_data)[1];
+            position.z = (*input_data)[2];
+
+            hAngle = (*input_data)[3];
+            vAngle = (*input_data)[4];
+
+            calculateDirecRightUp();
+        }
+    }
+
+    void input_update(WindowSystem &win);
+
+    // void setAngles() {
+    // }
+
+public:
+    Camera(gl_math::vec3 pos, float input_h = 0, float input_v = 0) {
+        
+        hAngle = input_h; vAngle = input_v;
+        position = pos;
+
+        calculateDirecRightUp();
+    }
 };
 
 // Base class for entity-renderer, terrain-renderer, skybox-renderer, gui-renderer

@@ -29,7 +29,7 @@ void GuiRenderer::allocShadersData() {
     // load projection matrix for the only once
     shader->start();
         // // guiShader doesn't support projection/view_matrix now
-        // guiShader->loadProjMatrix(getProjMatrix());
+        // shader->loadProjMatrix(getProjMatrix());
     shader->stop();
 
     guiShader = shader;

@@ -47,6 +47,15 @@ int test_03_terrain() {
             win.stop();
             return -1;
         }
+        if (!renderers.waterRenderer.ready()) {
+            win.stop();
+            return -1;
+        }
+
+        printf("shaders init done, press anything to continue ...\n\n"); {
+            int dbg;
+            scanf("%d", &dbg);
+        }
     }
     renderers.specificSettingsOn();
 
@@ -70,7 +79,15 @@ int test_03_terrain() {
 
         renderers.terrainRenderer.addTerrain(targets.getTerrain());
         renderers.skyboxRenderer.setSkybox(targets.getSkybox());
-        renderers.guiRenderer.addGui(targets.getGui());
+
+        // renderers.guiRenderer.addGui(targets.getGui00());
+        // renderers.guiRenderer.addGui(targets.getGui01());
+
+        WaterTile* waterTiles = targets.getWaterTiles();
+        renderers.waterRenderer.addWaterTile(&waterTiles[0]);
+        renderers.waterRenderer.addWaterTile(&waterTiles[1]);
+        renderers.waterRenderer.addWaterTile(&waterTiles[2]);
+        renderers.waterRenderer.addWaterTile(&waterTiles[3]);
     }
 
     // Light light; {
@@ -147,6 +164,12 @@ int test_03_terrain() {
     double update_cycle = (float)(1.0f / (55)),
            render_cycle = (float)(1.0f / (55)),
            min_cycle = (update_cycle < render_cycle) ? (update_cycle) : (render_cycle);
+
+    float clipPlane_display_down_all[] = {0.0f, 0.0f, -1.0f, 1000.0f};
+    // float clipPlane_display_down[] = {0.0f, 0.0f, -1.0f, -1.5f};
+    // float clipPlane_display_up[] = { 0.0f, 0.0f, 1.0f, -2.0f };
+    float clipPlane_display_down[] = { 0.0f, 0.0f, -1.0f, (targets.getWaterTiles())[0].getHeight() };
+    float clipPlane_display_up[] = { 0.0f, 0.0f, 1.0f, -(targets.getWaterTiles())[0].getHeight() };
 
     Instrumentor::Get().BeginSession("main loop profiling");
     while ( win.isValid() ) {
@@ -250,11 +273,9 @@ int test_03_terrain() {
             PROFILE_SCOPE("Update inputs, view...");
             
             win.pollEvents();  // not respond when close win with mouse without this
-            
+
             cam.input_update(win);
-            // renderer.calculateViewMatrix(cam.getPosition(), cam.getDirection(), cam.getUp());
             BaseRenderer::calculateViewMatrix(cam.getPosition(), cam.getDirection(), cam.getUp());
-            // hlRenderer.terrainRenderer.calculateViewMatrix(cam.getPosition(), cam.getDirection(), cam.getUp());
 
             // entity.increasePosition(0.0f, 0.0f, 0.002f);
             // entity.increaseRotation(0.0005f, 0.0f, 0.0f);
@@ -353,8 +374,34 @@ int test_03_terrain() {
         {
             PROFILE_SCOPE("Render");
 
+            // float distance = 2 * (cam.getHeight() - targets.getWater()->getHeight()); {
+            //     cam.setHeight(cam.getHeight() - distance);
+            //     cam.inverseVerticalAngle();
+            //     cam.calculateDirecRightUp();
+            //     BaseRenderer::calculateViewMatrix(cam.getPosition(), cam.getDirection(), cam.getUp());
+            //         targets.getWaterFbos()->bindReflectionFBO();
+            //         renderers.processScene(test_light, &clipPlane_display_up);
+            //         targets.getWaterFbos()->unbindCurrentFBO();
+            //     cam.setHeight(cam.getHeight() + distance);
+            //     cam.inverseVerticalAngle();
+            //     cam.calculateDirecRightUp();
+            //     BaseRenderer::calculateViewMatrix(cam.getPosition(), cam.getDirection(), cam.getUp());
+            // }
+
+            // targets.getWaterFbos()->bindRefractionFBO();
+            // renderers.processScene(test_light, &clipPlane_display_down);
+            // targets.getWaterFbos()->unbindCurrentFBO();
+
             // renderer.process(light, num_misa_entities, num_all_entities);
-            renderers.process(test_light);
+            // renderers.processScene(test_light, &clipPlane_up);
+            renderers.processScene(test_light, &clipPlane_display_down_all);
+
+            WaterFrameBuffers *waterFbos = targets.getWaterFbos();
+            unsigned int dudvTex = targets.getWaterDudvTexture();
+            unsigned int normalTex = targets.getWaterNormalTexture();
+            renderers.processWater(waterFbos, dudvTex, normalTex);  // high consumption on 1st frame ???
+
+            renderers.processGui();
 
             last_render_time = now;
             rendered_times++;

@@ -170,55 +170,71 @@ private:
     }
 };
 
-// Currently only used for skybox model, 
-// attribute_idx:   0
-// stride in float: 3, tobe rendered with glDrawArray(),
-// TODO: vao to replace vbo ...
-class RawModel {
+// The following data-structure is used for generating a 'simple' 3d-model (a few triangles), 
+// like the model for skybox-cube, GUI-rectangle, water-tile rectangle ... 
+//
+// This structure contains info for only 1 vbo of data for attribute-0 in the corresponding glsl-shader,
+// which usually indicates vertices' positions, a vertex's uv information for texture 
+// can be generated according to its position.
+//
+// Models for skybox, gui or water-tile generated from this class
+// doesn't have normal information in this structure either,
+// though it could be calculated according to pos in shader.
+//
+// It does not include Texture-id info, texture-id has to be bind seperately before drawing.
+//
+// To draw this model, 
+//     1. bind the vbo-id first by calling                            getVboID(), then enable the corresponding glsl-shader's attri-0 (or other index),
+//     2. set the attribute-data's stride correctly by calling        getVerticesStride(), 
+//        bind the texture seperately (optionally),
+//     3. then draw by calling glDrawArray(Tri/Tri_strip/Line/..., 0, getVerticesCount())
+//
+// For skybox model, gui, and water-tile model:
+//     'water-tile' allocated in: LoadTargets_03::initWaterTile()
+//
+// stride in float: 3 for skybox model, 2 for gui model, 2 for water-tile model
+// vertices count:  ? for skybox,                                     ==> glDrawArray(triangle, 0, ?), 
+//                  4 for gui,                                        ==> glDrawArray(triangle_strip, 0, 4), 
+//                  2 (triangles) * 3 vert/triangle = 6 for watertile ==> glDrawArray(triangle, 0, 6), 
+//
+// TODO: stride-in-float shall be supported, rather than taking 3 or 2 according to different cases
+//       vao to replace vbo ...
+//
+class SingleAttributeModel {
+
+private:
+    unsigned int dataStride = 0;  // Up to the glsl-shader, 2-floats for water-tile model, 
+                                  //                        3-floats for skybox's cube model
+    int vboID         = -1, 
+        verticesCount = -1;
+
 public:
-    void setData(int input_vbo_id, int input_vertex_count) {
-        vertexCount = input_vertex_count;
-        vboID = input_vbo_id;
-    }
-
-    int getVertexCount(void) {
-        return vertexCount;
-    }
-
-    int getVboID(void) {
+    // Bind the vbo-id, enable glsh-shader's attribute-0 to use the bound vbo-data
+    //  (vertices-position data for skybox, gui and water-tile shaders in attri-0), 
+    // and set the stride-by-float correctly for the bound data
+    // before drawing with glDrawArray()
+    int getVboID() {
         return vboID;
     }
 
-private:
-    int vboID       = -1, 
-        vertexCount = -1;
+    unsigned int getVerticesStride() {
+        return dataStride;
+    }
+
+    // Optional: bind gl-texture id before drawing
+
+    // Draw by calling glDrawArray(TRI/TRI_STRIP, 0, singleAttrModel->getVerticesCount() )
+    int getVerticesCount() {
+        return verticesCount;
+    }
+
+public:
+    void setData(unsigned int input_vertices_stride, int input_vertices_count, int input_vbo) {
+        dataStride = input_vertices_stride;
+        verticesCount = input_vertices_count;
+        vboID = input_vbo;
+    }
 };
-
-// class EntityInfo {
-// public:
-//     enum transform {
-//         x = 0, y, z, rot_x, rot_y, rot_z, scale, max
-//     };
-
-//     EntityInfo(float input_info[][transform::max]) {
-//         if (!input_info)
-//             return;
-
-//         for (unsigned int i = transform::x; i < transform::max; i++) {
-//             pos_rot_scale[i] = (*input_info)[i];
-//         }
-//     }
-
-//     float(*getData())[transform::max] {
-//         return &pos_rot_scale;
-//     }
-
-// private:
-//     float pos_rot_scale[transform::max];
-// };
-
-
-// class Entity;  // forward declare doesn't work for enum ???
 
 struct Transform {
     enum transform {
@@ -421,3 +437,29 @@ private:
     StaticTexture *texture;
     BaseModel *model;
 };
+
+// class EntityInfo {
+// public:
+//     enum transform {
+//         x = 0, y, z, rot_x, rot_y, rot_z, scale, max
+//     };
+
+//     EntityInfo(float input_info[][transform::max]) {
+//         if (!input_info)
+//             return;
+
+//         for (unsigned int i = transform::x; i < transform::max; i++) {
+//             pos_rot_scale[i] = (*input_info)[i];
+//         }
+//     }
+
+//     float(*getData())[transform::max] {
+//         return &pos_rot_scale;
+//     }
+
+// private:
+//     float pos_rot_scale[transform::max];
+// };
+
+
+// class Entity;  // forward declare doesn't work for enum ???

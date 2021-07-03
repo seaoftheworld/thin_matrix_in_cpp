@@ -16,8 +16,11 @@ namespace gl_math {
 
     vec3 normalize_vec3(vec3 input);
 
+    // Used gui-data and watertile-data as input, to generate model-matrix
+    // for gui and water renderers.
     void create_transform_matrix(const float pos[][2], const float scale[][2], mat4 *result);
-    
+    void create_transform_matrix(const float pos[][3], float scale_x, float scale_y, mat4 *result);
+
     void model_matrix_SRT_Normal(const float transform[][Entity::transform::max], mat4 *result);
     void model_matrix_STR_Rot(const float transform[][Entity::transform::max], mat4 *result);
     void get_xyz_from_rotz(float input_pos[][3], float rot_z, float output_result[][3]);

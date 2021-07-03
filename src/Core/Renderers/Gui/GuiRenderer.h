@@ -34,18 +34,19 @@ public:
     
     void render() {
 
-        unsigned int vertices_count = 0;
+        unsigned int vertices_count = 0, stride_in_float = 0;
         if (GuiType00::rect) {
+            stride_in_float = GuiType00::rect->getVerticesStride();
+            vertices_count = GuiType00::rect->getVerticesCount();
+
             glBindBuffer(GL_ARRAY_BUFFER, GuiType00::rect->getVboID());
-            glEnableVertexAttribArray(0);            
+            glEnableVertexAttribArray(0);
             glVertexAttribPointer(
                 0, 
-                2, GL_FLOAT, 
+                stride_in_float, GL_FLOAT,
                 GL_FALSE, 
-                2 << 2,  // N-floats * 4 ==> stride in bytes (N = 3, 2, ...)
+                stride_in_float << 2,  // N-floats * 4 ==> stride in bytes (N = 3, 2, ...)
                 0);
-
-            vertices_count = GuiType00::rect->getVertexCount();
         }
 
         for (unsigned int i = 0; i < guis.size(); i++) {

@@ -48,7 +48,7 @@ public:
     void freeShadersData() override;
     bool ready() override;
     
-    void run(const std::vector<Light *> &lights) {
+    void run(const std::vector<Light *> &lights, float clipPlane[][4]) {
 
         if (!entityShader) {
             return;
@@ -71,6 +71,10 @@ public:
         entityShader->loadReflectivity(20.0f);
         entityShader->loadShineDamper(20.0f);
         entityShader->loadLights(lights);
+
+        if (clipPlane) {
+            entityShader->loadClipPlane(&(*clipPlane)[0]);
+        }
             render();
 
 

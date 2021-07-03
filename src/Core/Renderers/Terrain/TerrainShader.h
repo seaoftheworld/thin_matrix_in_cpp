@@ -2,11 +2,8 @@
 #include "Core/Shader/Base/BaseShader.h"
 #include "Core/Common/light.h"
 
-// #define TERRAIN_VSH_PATH "data/shaders/terrain.vsh"
-// #define TERRAIN_FSH_PATH "data/shaders/terrain.fsh"
-
-#define TERRAIN_VSH_PATH "data/shaders/terrain_multi_lights.vsh"
-#define TERRAIN_FSH_PATH "data/shaders/terrain_multi_lights.fsh"
+#define TERRAIN_VSH_PATH "data/shaders/terrain/terrain_multi_lights_clip_plane.vsh"
+#define TERRAIN_FSH_PATH "data/shaders/terrain/terrain_multi_lights_clip_plane.fsh"
 #define TERRAIN_SHADER_MAX_LIGHTS (8)
 
 class TerrainShader : public BaseShader {
@@ -102,6 +99,10 @@ public:
     //     uniform1f(alpha_loc, p);
     // }
 
+    void loadClipPlane(float pa4f[][4]) {
+        uniform4fv(clipPlane_loc, 1, &(*pa4f)[0]);
+    }
+
 private:
     // int lightPosition_loc = -1, 
     //     lightColor_loc = -1,
@@ -117,4 +118,6 @@ private:
         texture02_sampler_loc = -1, 
         texture03_sampler_loc = -1, 
         blendMap_sampler_loc = -1;
+
+    int clipPlane_loc = -1;
 };

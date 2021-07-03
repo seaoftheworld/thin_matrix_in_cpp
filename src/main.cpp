@@ -4,6 +4,7 @@ int test_00_basic_entity_renderer();
 int test_01_specular_entity_renderer();
 int test_02_multi_lights_entity_renderer();
 int test_03_terrain();
+int test_04();
 
 int main() {
     
@@ -43,6 +44,12 @@ int main() {
                 result = test_03_terrain();
                 run = false;
             break;
+
+            case 4:
+                result = test_04();
+                run = false;
+            break;
+
 
             case 999:
                 run = false;

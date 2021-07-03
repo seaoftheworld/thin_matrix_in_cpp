@@ -93,8 +93,9 @@ int test_02_multi_lights_entity_renderer() {
     // Camera cam(gl_math::vec3(-1.93f, 2.4f, 3.9f), 0.0f, -3.14f / 4.0f);
     // Camera cam(gl_math::vec3(-1.93f, 2.4f, 3.9f), 2.68f, -0.7f);
     Camera cam(gl_math::vec3(-1.36f, 3.15f, 4.25f), 2.65f, -0.765f);
-
     LightsPositionsUpdate lightsPositionsUpdate;
+
+    // float clipPlane_dummy[][4] = {0.0f, 0.0f, -1.0f, 0.0f};  // dummy since clipPlane not enabled
 
     // double prevFrameTime = 0;
     double now = 0, 

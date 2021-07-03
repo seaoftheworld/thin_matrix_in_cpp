@@ -7,8 +7,9 @@
 // #include "Core/Renderers/Terrain/Terrain.h"
 // #include "Core/Renderers/Skybox/SkyboxRenderer.h"  // TODO: shall seperate skybox-data with skybox-renderer
 // #include "Core/Renderers/Gui/Gui.h"                //       like it is for the other renderers
+// #include "Core/Renderers/Water/WaterTile.h"
 
-#include "WrappingRenderer.h"  // to include data types for terrain, skybox, and gui
+#include "WrappingRenderer.h"  // to include data types for terrain, skybox, gui, and water
 
 #include "test_cases/02_multi_lighting_entity_renderer/LightsPositionsUpdate.h"
 
@@ -24,9 +25,15 @@ class LoadTargets_03 {
 
     Terrain terrain;
     Skybox  skybox;
-    GuiType00 gui;
+    GuiType00 gui_00;
+    GuiType00 gui_01;
 
-    void cleanUp() {
+    WaterFrameBuffers waterFbos;
+    WaterTile waterTile[4];
+    unsigned int water_dudvTexture = 0;
+    unsigned int water_normalTexture = 0;
+
+    void initData() {
         single_vbo_entity.cleanUp();
         multi_vbo_entity.cleanUp();
 
@@ -47,6 +54,10 @@ class LoadTargets_03 {
 
         loader.cleanUp();
     }
+    void cleanUp() {
+        initData();
+        waterFbos.cleanUp();  // this shall not be called in constructor
+    }
 
     void initSingleVboEntity();
     void initMultiVboEntity();
@@ -57,22 +68,25 @@ class LoadTargets_03 {
     void initTerrain();
     void initSkybox();
     void initGui();
+    void initWaterTiles();
+
+    void initWaterTextures();
 
 public:
     static float misa_offset_x;
     static float misa_offset_y;
 
     LoadTargets_03() {
-        cleanUp();
+        initData();
 
         // init entities
-        initSingleVboEntity();
-        initMultiVboEntity();
+        // initSingleVboEntity();
+        // initMultiVboEntity();
 
         initCrate();
         initMisa();
-
         initRock();
+
         printf("\n\n models/entities init done, press anything to continue ...\n\n"); {
             int dbg;
             scanf("%d", &dbg);
@@ -85,7 +99,11 @@ public:
         initSkybox();
 
         // init gui
-        initGui();
+        // initGui();
+
+        // init water
+        initWaterTextures();
+        initWaterTiles();
     }
     virtual ~LoadTargets_03() {
         cleanUp();
@@ -106,13 +124,31 @@ public:
     AssimpLib *getRock() {
         return &rock;
     }
+
     Terrain *getTerrain() {
         return &terrain;
     }
     Skybox *getSkybox() {
         return &skybox;
     }
-    GuiType00 *getGui() {
-        return &gui;
+
+    GuiType00 *getGui00() {
+        return &gui_00;
+    }
+    GuiType00* getGui01() {
+        return &gui_01;
+    }
+
+    WaterFrameBuffers *getWaterFbos() {
+        return &waterFbos;
+    }
+    WaterTile *getWaterTiles() {
+        return waterTile;
+    }
+    unsigned int getWaterDudvTexture() {
+        return water_dudvTexture;
+    }
+    unsigned int getWaterNormalTexture() {
+        return water_normalTexture;
     }
 };

@@ -3,8 +3,10 @@
 #include "Core/Shader/Base/BaseShader.h"
 #include "Core/Common/light.h"
 
-#define MULTI_LIGHTS_VSH_PATH "data/shaders/multi_lights.vsh"
-#define MULTI_LIGHTS_FSH_PATH "data/shaders/multi_lights.fsh"
+// #define MULTI_LIGHTS_VSH_PATH "data/shaders/models/multi_lights_clip_plane.vsh"
+// #define MULTI_LIGHTS_FSH_PATH "data/shaders/models/multi_lights_clip_plane.fsh"
+#define MULTI_LIGHTS_VSH_PATH "data/shaders/models/multi_lights.vsh"
+#define MULTI_LIGHTS_FSH_PATH "data/shaders/models/multi_lights.fsh"
 
 #define SHADER_MAX_LIGHTS (8)
 
@@ -52,6 +54,10 @@ public:
 
     void loadShineDamper(float input) {
         uniform1f(objShineDamper_loc, input);
+    }
+
+    void loadClipPlane(float *p4f) {
+        uniform4fv(clipPlane_loc, 1, p4f);
     }
 
     // void loadAlpha(float p) {
@@ -144,4 +150,6 @@ private:
 
     int objReflect_loc = -1,
         objShineDamper_loc = -1;
+
+    int clipPlane_loc = -1;
 };

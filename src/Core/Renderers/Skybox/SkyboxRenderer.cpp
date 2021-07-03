@@ -1,6 +1,6 @@
 #include "SkyboxRenderer.h"
 
-const float skybox_init_data_array[NUM_SKYBOX_VERTICES * 3] = {
+const float skybox_init_data_array[SKYBOX_CUBE_MODEL_VERT_STRIDE * SKYBOX_CUBE_MODEL_VERT_NUM] = {
 
     // Bottom
     -1,  1, -1,
@@ -59,17 +59,15 @@ void Skybox::init(Loader *loader, std::string imgPaths[][6], unsigned int cube_e
         return;
     }
 
-    float vertices_data[NUM_SKYBOX_VERTICES * 3];
-
-    for (unsigned int i = 0; i < NUM_SKYBOX_VERTICES * 3; i++) {
+    float vertices_data[SKYBOX_CUBE_MODEL_VERT_STRIDE * SKYBOX_CUBE_MODEL_VERT_NUM];
+    for (unsigned int i = 0; i < SKYBOX_CUBE_MODEL_VERT_STRIDE * SKYBOX_CUBE_MODEL_VERT_NUM; i++) {
         vertices_data[i] = cube_edge_length * skybox_init_data_array[i];
     }
 
-    cube = loader->loadRawModel(vertices_data, 3, NUM_SKYBOX_VERTICES);
-    printf("cube: %p\n", cube);
+    cube = loader->allocSingleAttributeModel(vertices_data, SKYBOX_CUBE_MODEL_VERT_STRIDE, SKYBOX_CUBE_MODEL_VERT_NUM);
     if (cube) {
         printf("cube vbo: %d\n", cube->getVboID());
-        printf("cube vcount: %d\n", cube->getVertexCount());
+        printf("cube vcount: %d\n", cube->getVerticesCount());
     }
 
     cubeTexture = loader->loadStaticTextureCube(imgPaths);

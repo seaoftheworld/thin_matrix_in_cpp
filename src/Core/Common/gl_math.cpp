@@ -72,7 +72,8 @@ namespace gl_math {
 
         mat4 translate = glm::translate(
             mat4(1.0f),
-            vec3((*input_pos)[0], (*input_pos)[1], 0.0f));
+            vec3((*input_pos)[0], (*input_pos)[1], 0.0f)
+        );
 
             // mat4   rotate_x = glm::rotate(mat4(1.0f), TRANS_INFO(rot_x), vec3(1.0f, 0.0f, 0.0f));
             // mat4   rotate_xy = glm::rotate(rotate_x, TRANS_INFO(rot_y), vec3(0.0f, 1.0f, 0.0f));
@@ -83,6 +84,20 @@ namespace gl_math {
             mat4(1.0f), 
             vec3((*input_scale)[0], (*input_scale)[1], 1.0f) );
         
+        // *result = translate * rotate_xyz * scale;
+        *result = translate * scale;
+    }
+
+    void create_transform_matrix(const float input_pos[][3], float scale_x, float scale_y, mat4 *result) {
+
+        mat4 translate = glm::translate(
+            mat4(1.0f), vec3((*input_pos)[0], (*input_pos)[1], (*input_pos)[2])
+        );
+
+        mat4 scale = glm::scale(
+            mat4(1.0f), vec3(scale_x, scale_y, 1.0f) );
+
+        // *result = translate * rotate_xyz * scale;
         // *result = translate * rotate_xyz * scale;
         *result = translate * scale;
     }

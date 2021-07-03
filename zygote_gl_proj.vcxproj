@@ -104,6 +104,10 @@
     <ClCompile Include="src\Core\Renderers\Terrain\Terrain.cpp" />
     <ClCompile Include="src\Core\Renderers\Terrain\TerrainRenderer.cpp" />
     <ClCompile Include="src\Core\Renderers\Terrain\TerrainShader.cpp" />
+    <ClCompile Include="src\Core\Renderers\Water\WaterFrameBuffers.cpp" />
+    <ClCompile Include="src\Core\Renderers\Water\WaterRenderer.cpp" />
+    <ClCompile Include="src\Core\Renderers\Water\WaterShader.cpp" />
+    <ClCompile Include="src\Core\Renderers\Water\WaterTile.cpp" />
     <ClCompile Include="src\Core\Shader\Base\BaseShader.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\test_cases\00_basic_entity_renderer\main_00.cpp" />
@@ -115,6 +119,9 @@
     <ClCompile Include="src\test_cases\03_combined_test\main_03.cpp" />
     <ClCompile Include="src\test_cases\03_combined_test\LoadTargets_03.cpp" />
     <ClCompile Include="src\test_cases\03_combined_test\WrappingRenderer.cpp" />
+    <ClCompile Include="src\test_cases\04_test\LoadTargets_04.cpp" />
+    <ClCompile Include="src\test_cases\04_test\main_04.cpp" />
+    <ClCompile Include="src\test_cases\04_test\WrappingRenderer_04.cpp" />
     <ClCompile Include="src\WindowSystem\WindowSystem.cpp" />
   </ItemGroup>
   <ItemGroup>

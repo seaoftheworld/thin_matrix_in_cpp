@@ -5,6 +5,8 @@
 
 float LoadTargets_03::misa_offset_x = 4.0f;
 float LoadTargets_03::misa_offset_y = 4.0f;
+// float LoadTargets_03::misa_offset_x = 8.0f;
+// float LoadTargets_03::misa_offset_y = 8.0f;
 
 void LoadTargets_03::initSingleVboEntity() {
 
@@ -41,9 +43,11 @@ void LoadTargets_03::initSingleVboEntity() {
             printf("  Failed to generate model for single_vbo_entity\n");
             // return false;
         }
+        else {
+            printf("  3D model for single_vbo_entity generated,");
+            printf("    vbo/ibo-ids: %d, %d\n\n", m->getVboId(), m->getIboId());
+        }
 
-        printf("  3D model for single_vbo_entity generated,");
-        printf("    vbo/ibo-ids: %d, %d\n\n", m->getVboId(), m->getIboId());
     }
 
     StaticTexture *texture = NULL; {
@@ -54,9 +58,10 @@ void LoadTargets_03::initSingleVboEntity() {
             printf("  Failed to generate texture for single_vbo_entity\n");
             // return false;
         }
-
-        printf("  Texture for single_vbo_entity generated,");
-        printf("    tex-id: %d\n\n", texture->getId());
+        else {
+            printf("  Texture for single_vbo_entity generated,");
+            printf("    tex-id: %d\n\n", texture->getId());
+        }
     }
 
     if (texture && m) {
@@ -132,17 +137,18 @@ void LoadTargets_03::initMultiVboEntity() {
         if (!model) {
             printf("  Failed to generate model for multi_vbo_entity\n");
         }
+        else {
+            printf("  3D model for multi_vbo_entity generated,");
+            printf("    vbos/ibo-ids:  ");
+            
+            int ids[StaticModel::allBuffNum];
+            model->getBuffers(&ids);
 
-        printf("  3D model for multi_vbo_entity generated,");
-        printf("    vbos/ibo-ids:  ");
-        
-        int ids[StaticModel::allBuffNum];
-        model->getBuffers(&ids);
-
-        for (int i = 0; i < StaticModel::allBuffNum; i++) {
-            printf("%d", ids[i]);
+            for (int i = 0; i < StaticModel::allBuffNum; i++) {
+                printf("%d", ids[i]);
+            }
+            printf("\n\n");
         }
-        printf("\n\n");
     }
 
     StaticTexture *texture = NULL; {
@@ -153,9 +159,10 @@ void LoadTargets_03::initMultiVboEntity() {
             printf("  Failed to generate texture for multi_vbo_entity\n");
             // return false;
         }
-
-        printf("  Texture for multi_vbo_entity generated,");
-        printf("    tex-id: %d\n\n", texture->getId());
+        else {
+            printf("  Texture for multi_vbo_entity generated,");
+            printf("    tex-id: %d\n\n", texture->getId());
+        }
     }
 
     if (texture && model) {
@@ -335,30 +342,116 @@ void LoadTargets_03::initSkybox() {
 void LoadTargets_03::initGui() {
 
     float gui_rect_vertices[GUI_RECT_VERTICES_STRIDE * GUI_RECT_VERTICES_NUM] = {
-        -1.0f, 1.0, -1.0f, -1.0f, 
-         1.0f, 1.0f, 1.0f, -1.0f
+        -1.0f, 1.0,  -1.0f, -1.0f, 
+         1.0f, 1.0f,  1.0f, -1.0f
     };
-    GuiType00::rect = loader.loadRawModel(gui_rect_vertices, GUI_RECT_VERTICES_STRIDE, GUI_RECT_VERTICES_NUM);
+    GuiType00::rect = loader.allocSingleAttributeModel(gui_rect_vertices, GUI_RECT_VERTICES_STRIDE, GUI_RECT_VERTICES_NUM);
 
     {
-        StaticTexture *guiTexture = NULL; {
-            std::string guiTexturePath = "data/tex/marker.png";
-            loader.loadStaticTextures(&guiTexturePath, 1, &guiTexture);
-        }
+        // StaticTexture *guiTexture = NULL; {
+        //     std::string guiTexturePath = "data/tex/marker.png";
+        //     loader.loadStaticTextures(&guiTexturePath, 1, &guiTexture);
+        // }
 
-        if (guiTexture) {
-            float gui_pos[] = {-0.75f, 0.75f};
-            float gui_scale[] = { 0.25f, 0.25f };
+        // if (guiTexture) {
+        //     float gui_pos[] = {-0.75f, 0.75f};
+        //     float gui_scale[] = { 0.25f, 0.25f };
 
-            gui.init(guiTexture->getId(), &gui_pos, &gui_scale);
-            
-            printf("gui tex id: %d\n", gui.getTextureID());
-            // printf("gui addr: 0x%p\n", &gui);
-        }
+        //     gui.init(guiTexture->getId(), &gui_pos, &gui_scale);
+        //     printf("gui tex id: %d\n", gui.getTextureID());
+        //     // printf("gui addr: 0x%p\n", &gui);
+        // }
+    }
+
+    {
+        float gui_pos[] = { -0.7f, 0.7f };
+        float gui_scale[] = { 0.25f, 0.25f };
+        gui_00.init(waterFbos.getReflectionTexture(), &gui_pos, &gui_scale);
+    }
+
+    {
+        float gui_pos[] = { 0.7f, 0.7f };
+        float gui_scale[] = { 0.25f, 0.25f };
+        gui_01.init(waterFbos.getRefractionTexture(), &gui_pos, &gui_scale);
     }
 
     printf("gui init done, press anything to continue ...\n\n"); {
         int dbg;
         scanf("%d", &dbg);
+    }
+}
+
+void LoadTargets_03::initWaterTiles() {
+
+    // The normalized values from -1 ~ 1 belows corresponds to 
+    // vertex-shader's calculation for UV coordinates:
+    //    uv = vec2(x/2 + 0.5, y/2 + 0.5)
+
+    // For glDrawArray(trangle_strip) mode
+    // float water_tile_vertices[WATER_TILE_VERTICES_STRIDE * WATER_TILE_VERTICES_NUM] = {
+    //     -1.0f, 1.0, -1.0f, -1.0f, 
+    //      1.0f, 1.0f, 1.0f, -1.0f
+    // };
+    // WaterTile::rect = loader.loadRawModel(water_tile_vertices, WATER_TILE_VERTICES_STRIDE, WATER_TILE_VERTICES_NUM);
+
+    // TODO: shall be done in water renderer ??? since this is ubiquatous for all water and corresponds to shader
+    // Data to be used by glDrawArray(triangle_mode)
+    float water_tile_vertices[WATER_TILE_VERTICE_STRIDE * WATER_TILE_TRIANGLES_NUM * 3] = {
+        -1, -1,  -1, 1,  1, -1,   // left-bottom triangle (        half rectangle) of a water-tile (square width 2), facing the XY panel
+         1, -1,  -1, 1,  1, 1     // right-top triangle   (another half rectangle) facing the XY panel
+    };
+    WaterTile::rect = loader.allocSingleAttributeModel(water_tile_vertices, WATER_TILE_VERTICE_STRIDE, WATER_TILE_TRIANGLES_NUM * 3);
+
+    // float xyz_offsets[] = {-1.0f, -1.0f, 0.0f};
+    // float xyz_offsets[] = {-1.0f, -1.0f, 0.0f};
+    float offset[] = {10.0f, 10.0f};
+    float xyz_translate[][3] = {
+        { 2.5f + offset[0],  2.5f + offset[1], -1.5f},
+        {-2.5f + offset[0],  2.5f + offset[1], -1.5f},
+        {-2.5f + offset[0], -2.5f + offset[1], -1.5f},
+        { 2.5f + offset[0], -2.5f + offset[1], -1.5f}
+    };
+    waterTile[0].init( &xyz_translate[0] );
+    waterTile[1].init( &xyz_translate[1] );
+    waterTile[2].init( &xyz_translate[2] );
+    waterTile[3].init( &xyz_translate[3] );
+
+    printf("water tile init done, press anything to continue ...\n\n"); {
+        int dbg;
+        scanf("%d", &dbg);
+    }
+}
+
+void LoadTargets_03::initWaterTextures() {
+    std::string texture_file; 
+    {
+        texture_file = "data/tex/water/waterDUDV.png";
+        StaticTexture *texture = NULL;
+
+        loader.loadStaticTextures(&texture_file, 1, &texture);
+        if (!texture) {
+            printf("  Failed to generate texture for water_dudv\n");
+        }
+        else {
+            water_dudvTexture = texture->getId();
+
+            printf("  Texture for water_dudv generated,");
+            printf("    id: %d\n\n", water_dudvTexture);
+        }
+    }
+    {
+        texture_file = "data/tex/water/matchingNormalMap.png";
+        StaticTexture *texture = NULL;
+
+        loader.loadStaticTextures(&texture_file, 1, &texture);
+        if (!texture) {
+            printf("  Failed to generate texture for water_normal\n");
+        }
+        else {
+            water_normalTexture = texture->getId();
+
+            printf("  Texture for water_normal generated,");
+            printf("    id: %d\n\n", water_normalTexture);
+        }
     }
 }

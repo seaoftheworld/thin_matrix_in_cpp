@@ -1,5 +1,5 @@
 #pragma once
-#include "../../Common/gl_header.h"
+#include "Core/Common/gl_header.h"
 
 #include <vector>  // terrain-shader.h and multi-lights-shader.h will 
 #include <string>  // need to include this for multi-lights
@@ -149,8 +149,11 @@ public:
 
         void uniform3fv(int location, unsigned short count, const float *p3f) {
             glUniform3fv( (GLint)location, count, (const GLfloat *)p3f);
-        } 
+        }
 
+        void uniform4fv(int location, unsigned short count, const float *p4f) {
+            glUniform4fv( (GLint)location, count, (const GLfloat *)p4f);
+        }
 
     // int linkProg();
 

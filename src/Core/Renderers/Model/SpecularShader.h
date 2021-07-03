@@ -3,8 +3,8 @@
 #include "Core/Shader/Base/BaseShader.h"
 #include "Core/Common/light.h"
 
-#define SPECULAR_VSH_PATH "data/shaders/specular.vsh"
-#define SPECULAR_FSH_PATH "data/shaders/specular.fsh"
+#define SPECULAR_VSH_PATH "data/shaders/models/specular.vsh"
+#define SPECULAR_FSH_PATH "data/shaders/models/specular.fsh"
 
 class SpecularShader : public BaseShader {
 

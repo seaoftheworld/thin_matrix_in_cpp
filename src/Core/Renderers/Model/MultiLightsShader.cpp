@@ -89,4 +89,7 @@ void MultiLightsShader::getAllUniformLocations() {
     objShineDamper_loc = getUniformLocation("shineDamper");
     objReflect_loc = getUniformLocation("reflectivity");
     printf("    unif_loc for reflec/shineDamper: %d, %d\n\n", objReflect_loc, objShineDamper_loc);
+
+    clipPlane_loc = getUniformLocation("plane");
+    printf("    unif_loc for plane: %d\n", clipPlane_loc);
 }

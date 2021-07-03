@@ -1,7 +1,6 @@
 #include "Core/Renderers/Model/ModelRendererMultiLights.h"
 
 class WrappingRenderer_02 {
-
     std::vector<Light *> lights;
 
 public:
@@ -38,7 +37,7 @@ public:
     
     void process() {
         prepare();
-        entityRenderer.run(lights);
+        entityRenderer.run(lights, NULL);
     }
 
 private:

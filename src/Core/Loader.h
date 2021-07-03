@@ -17,7 +17,7 @@ public:
     Loader() {
         pSingleVboModel.clear();
         pStaticModels.clear();
-        pRawModels.clear();
+        pSingleAttributeModels.clear();
 
         pStaticTextures.clear();
     }
@@ -38,13 +38,15 @@ public:
         float *input_attr_data[][StaticModel::vboNum], unsigned int vertex_count, 
         unsigned short *input_indices_data, unsigned int indices_count);
 
-    RawModel *loadRawModel(float *data, unsigned int stride_in_float, unsigned int vertex_count);
+    // allocSingleAttributeModel()
+    SingleAttributeModel *allocSingleAttributeModel(float *data, unsigned int vertices_stride, unsigned int vertices_count);
 
 private:
     vector<StaticModel_SingleVbo *> pSingleVboModel;
     vector<StaticModel *> pStaticModels;
 
-    vector<RawModel *> pRawModels;
+    // vector<RawModel *> pRawModels;
+    vector<SingleAttributeModel *> pSingleAttributeModels;
 
     vector<StaticTexture *> pStaticTextures;
 
